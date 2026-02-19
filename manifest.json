@@ -18,7 +18,14 @@
       "run_at": "document_idle"
     }
   ],
+  "web_accessible_resources": [
+    {
+      "resources": ["img/copy_btn.png"],
+      "matches": ["https://chatgpt.com/*", "https://chat.openai.com/*"]
+    }
+  ],
   "action": {
     "default_title": "ChappyMD"
   }
 }
+

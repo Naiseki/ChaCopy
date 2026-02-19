@@ -33,20 +33,68 @@ export function injectButtonIntoArticle(article: HTMLElement): void {
 
 function createMdButton(article: HTMLElement): HTMLButtonElement {
     const btn = document.createElement('button')
-    btn.textContent = 'MD'
     btn.setAttribute('aria-label', 'Copy as Markdown')
     btn.setAttribute('title', 'Copy as Markdown (ChappyMD)')
-    btn.style.cssText =
-        'font-size:12px;font-weight:600;padding:2px 6px;' +
-        'cursor:pointer;border:none;background:transparent;' +
-        'border-radius:6px;color:inherit;'
 
-    btn.addEventListener('click', () => void handleClick(article, btn))
+    // 洗練されたモダンデザイン
+    btn.style.cssText = `
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 10px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        background-color: transparent;
+        color: #00ff7f;
+        transition: all 150ms cubic-bezier(0.2, 0, 0.38, 0.9);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 32px;
+        height: 32px;
+        position: relative;
+        opacity: 0.8;
+    `
+
+    // コピーアイコン画像を設定
+    const img = document.createElement('img')
+    img.src = chrome.runtime.getURL('img/copy_btn.png')
+    img.alt = 'Copy'
+    img.style.cssText = 'width: 19px; height: 19px; object-fit: contain;'
+    btn.appendChild(img)
+
+    // 初期状態（画像）を保存
+    const initialHTML = btn.innerHTML
+
+    // ホバー時のスタイル
+    btn.addEventListener('mouseenter', () => {
+        btn.style.backgroundColor = 'var(--hover-bg, rgba(0, 0, 0, 0.05))'
+        btn.style.borderColor = 'var(--hover-border, rgba(0, 0, 0, 0.08))'
+        btn.style.opacity = '1'
+    })
+
+    // マウスアウト時のスタイル
+    btn.addEventListener('mouseleave', () => {
+        btn.style.backgroundColor = 'transparent'
+        btn.style.borderColor = 'transparent'
+        btn.style.opacity = '0.8'
+    })
+
+    // アクティブ時（クリック中）
+    btn.addEventListener('mousedown', () => {
+        btn.style.transform = 'scale(0.95)'
+    })
+
+    btn.addEventListener('mouseup', () => {
+        btn.style.transform = 'scale(1)'
+    })
+
+    btn.addEventListener('click', () => void handleClick(article, btn, initialHTML))
 
     return btn
 }
 
-async function handleClick(article: HTMLElement, btn: HTMLButtonElement): Promise<void> {
+async function handleClick(article: HTMLElement, btn: HTMLButtonElement, initialHTML: string): Promise<void> {
     const contentEl = article.querySelector<HTMLElement>(CONTENT_SELECTOR)
     if (!contentEl) {
         console.warn('[ChappyMD] メッセージ要素が見つかりません')
@@ -57,12 +105,13 @@ async function handleClick(article: HTMLElement, btn: HTMLButtonElement): Promis
 
     try {
         await navigator.clipboard.writeText(markdown)
-        const original = btn.textContent
-        btn.textContent = 'OK'
-        setTimeout(() => { btn.textContent = original }, 1500)
+        btn.innerHTML = ''
+        btn.textContent = 'Copied!'
+        setTimeout(() => { btn.innerHTML = initialHTML }, 1500)
     } catch (err) {
         console.error('[ChappyMD] クリップボード書き込み失敗:', err)
+        btn.innerHTML = ''
         btn.textContent = 'ERR'
-        setTimeout(() => { btn.textContent = 'MD' }, 1500)
+        setTimeout(() => { btn.innerHTML = initialHTML }, 1500)
     }
 }
