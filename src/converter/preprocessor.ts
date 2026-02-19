@@ -1,20 +1,33 @@
 /**
  * ChatGPT メッセージ DOM を Turndown 変換前に前処理する。
  *
- * 変換内容:
- * 1. ノードを深複製（元DOMは変更しない）
- * 2. KaTeX span を数式プレースホルダに置換
- * 3. <strong> 前後に空白を挿入（Turndown のエスケープ防止）
- * 4. ChatGPT の UI 要素を除去
+ * 以下の処理を順次実行:
+ * 1. ノードを深複製（元の DOM は変更しない）
+ * 2. KaTeX span を Markdown 互換の数式表現に置換
+ * 3. ChatGPT の UI クローム（脚注、引用、上付き文字）を除去
+ *
+ * @param node - 変換対象の HTMLElement
+ * @returns 前処理済みの HTMLElement（クローン）
  */
 export function preprocessNode(node: HTMLElement): HTMLElement {
     const clone = node.cloneNode(true) as HTMLElement
     replaceKatexNodes(clone)
-    // normalizeStrongSpacing(clone)
     removeUiChrome(clone)
     return clone
 }
 
+/**
+ * KaTeX span を Markdown 互換の数式表現に置換する。
+ *
+ * 処理順序:
+ * 1. ブロック数式（katex-display） → `$$...$$` に置換
+ * 2. インライン数式（span.katex）   → `$...$` に置換
+ *
+ * ブロック数式を先に処理することで、内部の span.katex が
+ * 後続のインライン処理で重複マッチされるのを防ぐ。
+ *
+ * @param root - 処理対象のルート HTMLElement
+ */
 function replaceKatexNodes(root: HTMLElement): void {
     // ブロック数式を先に処理（katex-display は katex を内包する）。
     // 先に処理することで内部の span.katex が後続のインライン処理で重複マッチしない。
@@ -46,6 +59,18 @@ function replaceKatexNodes(root: HTMLElement): void {
     }
 }
 
+/**
+ * 数式を格納するための span 要素を作成する。
+ *
+ * 作成される span には以下の特性がある:
+ * - オーナードキュメント: contextNode のオーナードキュメントに従う（フォールバック: グローバル document）
+ * - 属性: `data-chappymd-math="true"` を設定
+ * - コンテンツ: 提供された content を textContent として格納
+ *
+ * @param content - span に格納する数式コンテンツ（例: 生の LaTeX）
+ * @param contextNode - オーナードキュメント取得用のコンテキスト要素
+ * @returns 数式を格納し、マーカー属性を持つ HTMLSpanElement
+ */
 function createMathNode(content: string, contextNode: HTMLElement): HTMLSpanElement {
     const doc = contextNode.ownerDocument ?? document
     const span = doc.createElement('span')
@@ -55,35 +80,15 @@ function createMathNode(content: string, contextNode: HTMLElement): HTMLSpanElem
 }
 
 /**
- * <strong> 要素の前後に隣接するテキストノードへ空白を挿入する。
+ * ChatGPT の UI クローム（不要な要素）を除去する。
  *
- * 目的: Turndown は CommonMark のフランキングルールに基づき、
- * `）**` のように句読点・括弧に隣接した `**` をエスケープ（`\*\*`）
- * してしまう。DOM 段階で空白を入れることでこれを防ぐ。
+ * 除去対象:
+ * - `[data-footnotes]` - 脚注マーカー
+ * - `.citation`       - 引用記号
+ * - `sup`            - 上付き文字（数式指数など）
+ *
+ * @param root - 処理対象のルート HTMLElement
  */
-function normalizeStrongSpacing(root: HTMLElement): void {
-    const strongs = Array.from(root.querySelectorAll('strong'))
-    for (const strong of strongs) {
-        // 直前のテキストノードが非空白で終わる場合、空白を追加
-        const prev = strong.previousSibling
-        if (prev && prev.nodeType === Node.TEXT_NODE) {
-            const text = prev.textContent ?? ''
-            if (text.length > 0 && !/\s$/.test(text)) {
-                prev.textContent = text + ' '
-            }
-        }
-
-        // 直後のテキストノードが非空白で始まる場合、空白を追加
-        const next = strong.nextSibling
-        if (next && next.nodeType === Node.TEXT_NODE) {
-            const text = next.textContent ?? ''
-            if (text.length > 0 && !/^\s/.test(text)) {
-                next.textContent = ' ' + text
-            }
-        }
-    }
-}
-
 function removeUiChrome(root: HTMLElement): void {
     for (const el of root.querySelectorAll('[data-footnotes], .citation, sup')) {
         el.remove()

@@ -2,19 +2,27 @@
  * Turndown 出力の Markdown に後処理を適用する。
  *
  * 変換内容:
- * 1. 太字正規化: ** の前後に空白を確保
- *    （日本語 Markdown パーサー向け）
+ * 1. 太字正規化: ** の前後に空白を確保（日本語 Markdown パーサー向け）
+ *
+ * @param markdown - Turndown の出力 Markdown 文字列
+ * @returns 後処理済みの Markdown 文字列
+ */
+export function postprocess(markdown: string): string {
+    return normalizeBold(markdown)
+}
+
+/**
+ * Markdown の太字マーカー（**）の前後に空白を追加する。
  *
  * 以下の範囲では変換をスキップ:
  * - フェンスコードブロック (```...```)
  * - インラインコード (`...`)
  * - ブロック数式 ($$...$$)
  * - インライン数式 ($...$)
+ *
+ * @param markdown - 処理対象の Markdown 文字列
+ * @returns 太字が正規化された Markdown 文字列
  */
-export function postprocess(markdown: string): string {
-    return normalizeBold(markdown)
-}
-
 export function normalizeBold(markdown: string): string {
     const segments = splitProtectedSegments(markdown)
 
@@ -27,6 +35,18 @@ export function normalizeBold(markdown: string): string {
 
 type Segment = { text: string; protected: boolean }
 
+/**
+ * Markdown 文字列を保護区間と通常区間に分割する。
+ *
+ * 保護区間（変換対象外）:
+ * - フェンスコードブロック (```...```)
+ * - インラインコード (`...`)
+ * - ブロック数式 ($$...$$)
+ * - インライン数式 ($...$)
+ *
+ * @param input - 分割対象の Markdown 文字列
+ * @returns 保護区間フラグ付きセグメントの配列
+ */
 export function splitProtectedSegments(input: string): Segment[] {
     const segments: Segment[] = []
     let pos = 0
@@ -102,11 +122,20 @@ export function splitProtectedSegments(input: string): Segment[] {
     return segments
 }
 
+/**
+ * テキストの太字マーカー（**）の前後に空白を挿入する。
+ *
+ * ** で分割し、開き/閉じを交互に判定することで、
+ * 開き ** と閉じ ** を正しく区別する。
+ *
+ * @param text - 処理対象のテキスト
+ * @returns 太字が正規化されたテキスト
+ */
 function applyBoldNormalization(text: string): string {
-    text = text.replace(/\\\*\\\*/g, '**') // ** をエスケープ解除
+    // ** をエスケープ解除
+    text = text.replace(/\\\*\\\*/g, '**')
 
-    // ** で分割し、開き/閉じを交互に判定する。
-    // regex と違い、開き ** と閉じ ** を正しく区別できる。
+    // ** で分割し、開き/閉じを交互に判定する
     const parts = text.split('**')
     if (parts.length < 3) return text // 完全な太字スパンなし
 
@@ -141,3 +170,4 @@ function applyBoldNormalization(text: string): string {
 
     return result
 }
+

@@ -4,7 +4,13 @@ const INJECTED_ATTR = 'data-chappymd-injected'
 const COPY_BTN_SELECTOR = '[data-testid="copy-turn-action-button"]'
 const CONTENT_SELECTOR = '.markdown.prose'
 
-/** ページ内の既存アシスタントメッセージにボタンを注入する */
+/**
+ * ページ内の既存アシスタントメッセージに MD ボタンを注入する。
+ *
+ * 以下の条件を満たす article に対してボタンを注入:
+ * - アシスタントメッセージである（data-message-author-role="assistant"）
+ * - コピーボタンが既に存在している（ストリーミング完了を示す）
+ */
 export function injectButtonsIntoPage(): void {
     const articles = document.querySelectorAll<HTMLElement>(
         'article[data-testid^="conversation-turn-"]'
@@ -19,7 +25,13 @@ export function injectButtonsIntoPage(): void {
     }
 }
 
-/** 指定の article に MD ボタンを注入する（冪等） */
+/**
+ * 指定の article に MD ボタンを注入する（冪等操作）。
+ *
+ * すでに注入済みの場合は何もしない。コピーボタンが見つからない場合も処理をスキップ。
+ *
+ * @param article - ボタンを注入する article 要素
+ */
 export function injectButtonIntoArticle(article: HTMLElement): void {
     if (article.hasAttribute(INJECTED_ATTR)) return
 
@@ -31,6 +43,18 @@ export function injectButtonIntoArticle(article: HTMLElement): void {
     article.setAttribute(INJECTED_ATTR, 'true')
 }
 
+/**
+ * MD ボタン要素を作成する。
+ *
+ * 作成されるボタンの特徴:
+ * - 初期状態: コピーアイコン画像（img/copy_btn.png）を表示
+ * - ホバー時: 背景色と透明度が変化
+ * - クリック時: スケール（0.95倍に縮小）
+ * - クリック後: "Copied!" またはエラーメッセージを1.5秒表示
+ *
+ * @param article - ボタンを関連付ける article 要素（クリック時に参照）
+ * @returns 作成された button 要素
+ */
 function createMdButton(article: HTMLElement): HTMLButtonElement {
     const btn = document.createElement('button')
     btn.setAttribute('aria-label', 'Copy as Markdown')
@@ -94,6 +118,21 @@ function createMdButton(article: HTMLElement): HTMLButtonElement {
     return btn
 }
 
+/**
+ * MD ボタンのクリックハンドラー。
+ *
+ * 処理フロー:
+ * 1. article からコンテンツ（.markdown.prose）を取得
+ * 2. domToMarkdown() で Markdown に変換
+ * 3. navigator.clipboard.writeText() でクリップボードにコピー
+ * 4. 成功時: ボタンに "Copied!" を表示
+ * 5. 失敗時: ボタンに "ERR" を表示
+ * 6. 1.5 秒後: 初期状態（アイコン）に戻す
+ *
+ * @param article - コンテンツを含む article 要素
+ * @param btn - フィードバック表示用のボタン要素
+ * @param initialHTML - ボタンの初期状態（アイコン）の HTML
+ */
 async function handleClick(article: HTMLElement, btn: HTMLButtonElement, initialHTML: string): Promise<void> {
     const contentEl = article.querySelector<HTMLElement>(CONTENT_SELECTOR)
     if (!contentEl) {
