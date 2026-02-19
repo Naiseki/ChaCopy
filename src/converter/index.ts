@@ -7,8 +7,8 @@ import { postprocess } from './postprocessor'
  * 元のノードは変更しない。
  */
 export function domToMarkdown(contentNode: HTMLElement): string {
-  const processedNode = preprocessNode(contentNode)
-  const service = getTurndownService()
-  const rawMarkdown = service.turndown(processedNode)
-  return postprocess(rawMarkdown)
+    const processedNode = preprocessNode(contentNode)
+    const service = getTurndownService()
+    const rawMarkdown = service.turndown(processedNode)
+    return postprocess(rawMarkdown)
 }
