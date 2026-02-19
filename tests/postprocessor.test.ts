@@ -23,7 +23,7 @@ describe('normalizeBold', () => {
   })
 
   it('エスケープを正しく処理する', () => {
-    expect(normalizeBold('これは\*\*太字\*\*です')).toBe('これは **太字** です')
+    expect(normalizeBold('これは\\\*\\\*太字\\\*\\\*です')).toBe('これは **太字** です')
   })
 
   it('フェンスコードブロック内の太字は変換しない', () => {

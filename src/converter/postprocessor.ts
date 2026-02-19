@@ -103,7 +103,7 @@ export function splitProtectedSegments(input: string): Segment[] {
 }
 
 function applyBoldNormalization(text: string): string {
-  text = text.replace(/\*\*/g, '**') // ** をエスケープ解除
+  text = text.replace(/\\\*\\\*/g, '**') // ** をエスケープ解除
 
   // ** で分割し、開き/閉じを交互に判定する。
   // regex と違い、開き ** と閉じ ** を正しく区別できる。

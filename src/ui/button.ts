@@ -55,8 +55,6 @@ async function handleClick(article: HTMLElement, btn: HTMLButtonElement): Promis
 
   const markdown = domToMarkdown(contentEl)
 
-  console.log("mdに\*\*は含まれる？", markdown.includes('**'))
-
   try {
     await navigator.clipboard.writeText(markdown)
     const original = btn.textContent
