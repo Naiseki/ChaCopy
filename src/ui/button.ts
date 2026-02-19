@@ -4,6 +4,7 @@ const INJECTED_ATTR = 'data-chappymd-injected'
 const COPY_BTN_SELECTOR = '[data-testid="copy-turn-action-button"]'
 const CONTENT_SELECTOR = '.markdown.prose'
 
+/** ページ内の既存アシスタントメッセージにボタンを注入する */
 export function injectButtonsIntoPage(): void {
   const articles = document.querySelectorAll<HTMLElement>(
     'article[data-testid^="conversation-turn-"]'
@@ -18,6 +19,7 @@ export function injectButtonsIntoPage(): void {
   }
 }
 
+/** 指定の article に MD ボタンを注入する（冪等） */
 export function injectButtonIntoArticle(article: HTMLElement): void {
   if (article.hasAttribute(INJECTED_ATTR)) return
 
@@ -47,11 +49,13 @@ function createMdButton(article: HTMLElement): HTMLButtonElement {
 async function handleClick(article: HTMLElement, btn: HTMLButtonElement): Promise<void> {
   const contentEl = article.querySelector<HTMLElement>(CONTENT_SELECTOR)
   if (!contentEl) {
-    console.warn('[ChappyMD] Could not find message content element')
+    console.warn('[ChappyMD] メッセージ要素が見つかりません')
     return
   }
 
   const markdown = domToMarkdown(contentEl)
+
+  console.log("mdに\*\*は含まれる？", markdown.includes('**'))
 
   try {
     await navigator.clipboard.writeText(markdown)
@@ -59,7 +63,7 @@ async function handleClick(article: HTMLElement, btn: HTMLButtonElement): Promis
     btn.textContent = 'OK'
     setTimeout(() => { btn.textContent = original }, 1500)
   } catch (err) {
-    console.error('[ChappyMD] Clipboard write failed:', err)
+    console.error('[ChappyMD] クリップボード書き込み失敗:', err)
     btn.textContent = 'ERR'
     setTimeout(() => { btn.textContent = 'MD' }, 1500)
   }

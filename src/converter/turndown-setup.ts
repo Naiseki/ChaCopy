@@ -15,11 +15,11 @@ export function getTurndownService(): TurndownService {
     emDelimiter: '*',
   })
 
-  // GFM plugin: adds table support (| col | col |) and strikethrough
+  // GFM プラグイン: テーブル (| col | col |) と取消線を追加
   service.use(gfm)
 
-  // Math passthrough rule: return textContent verbatim without escaping.
-  // This must be added AFTER gfm so it takes precedence.
+  // 数式パススルールール: textContent をエスケープせずそのまま返す。
+  // gfm より後に追加することで優先度が高くなる。
   service.addRule('chappymd-math', {
     filter(node) {
       return (
@@ -32,7 +32,7 @@ export function getTurndownService(): TurndownService {
     },
   })
 
-  // Convert <br> to a single newline
+  // <br> を改行に変換
   service.addRule('linebreak', {
     filter: ['br'],
     replacement() {

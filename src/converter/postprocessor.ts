@@ -1,15 +1,15 @@
 /**
- * Applies post-processing transformations to Markdown output from Turndown.
+ * Turndown 出力の Markdown に後処理を適用する。
  *
- * Transformations:
- * 1. Bold normalization: ensure ** has whitespace on both sides
- *    (required for Japanese Markdown parsers)
+ * 変換内容:
+ * 1. 太字正規化: ** の前後に空白を確保
+ *    （日本語 Markdown パーサー向け）
  *
- * Skips transformations inside:
- * - Fenced code blocks (```...```)
- * - Inline code (`...`)
- * - Block math ($$...$$)
- * - Inline math ($...$)
+ * 以下の範囲では変換をスキップ:
+ * - フェンスコードブロック (```...```)
+ * - インラインコード (`...`)
+ * - ブロック数式 ($$...$$)
+ * - インライン数式 ($...$)
  */
 export function postprocess(markdown: string): string {
   return normalizeBold(markdown)
@@ -33,7 +33,7 @@ export function splitProtectedSegments(input: string): Segment[] {
   let normalStart = 0
 
   while (pos < input.length) {
-    // Fenced code block: must start at beginning of line
+    // フェンスコードブロック: 行頭で開始
     if (
       (pos === 0 || input[pos - 1] === '\n') &&
       input.startsWith('```', pos)
@@ -49,7 +49,7 @@ export function splitProtectedSegments(input: string): Segment[] {
       continue
     }
 
-    // Block math: $$...$$ at start of line
+    // ブロック数式: 行頭の $$...$$
     if (
       (pos === 0 || input[pos - 1] === '\n') &&
       input.startsWith('$$', pos)
@@ -65,7 +65,7 @@ export function splitProtectedSegments(input: string): Segment[] {
       continue
     }
 
-    // Inline code: `...`
+    // インラインコード: `...`
     if (input[pos] === '`' && input[pos + 1] !== '`') {
       if (pos > normalStart) {
         segments.push({ text: input.slice(normalStart, pos), protected: false })
@@ -78,7 +78,7 @@ export function splitProtectedSegments(input: string): Segment[] {
       continue
     }
 
-    // Inline math: $...$ (not $$)
+    // インライン数式: $...$ （$$ ではない）
     if (input[pos] === '$' && input[pos + 1] !== '$') {
       if (pos > normalStart) {
         segments.push({ text: input.slice(normalStart, pos), protected: false })
@@ -94,7 +94,7 @@ export function splitProtectedSegments(input: string): Segment[] {
     pos++
   }
 
-  // Flush remaining normal text
+  // 残りの通常テキストを追加
   if (normalStart < input.length) {
     segments.push({ text: input.slice(normalStart), protected: false })
   }
@@ -103,12 +103,41 @@ export function splitProtectedSegments(input: string): Segment[] {
 }
 
 function applyBoldNormalization(text: string): string {
-  // Use lookbehind/lookahead to avoid consuming boundary characters,
-  // which allows adjacent bold spans (e.g. A**B**C**D**E) to be handled correctly.
+  text = text.replace(/\*\*/g, '**') // ** をエスケープ解除
 
-  // Step 1: add space before **...** when preceded by non-whitespace non-asterisk
-  let result = text.replace(/(?<=[^\s*])(\*\*[^*\n]+?\*\*)/g, ' $1')
-  // Step 2: add space after **...** when followed by non-whitespace non-asterisk
-  result = result.replace(/(\*\*[^*\n]+?\*\*)(?=[^\s*])/g, '$1 ')
+  // ** で分割し、開き/閉じを交互に判定する。
+  // regex と違い、開き ** と閉じ ** を正しく区別できる。
+  const parts = text.split('**')
+  if (parts.length < 3) return text // 完全な太字スパンなし
+
+  let result = ''
+  let inBold = false
+
+  for (let i = 0; i < parts.length; i++) {
+    if (i === 0) {
+      result += parts[i]
+      continue
+    }
+
+    if (!inBold) {
+      // 開き **: 直前が非空白なら空白を挿入
+      if (result.length > 0 && !/\s$/.test(result)) {
+        result += ' '
+      }
+      result += '**'
+      inBold = true
+    } else {
+      // 閉じ **: 直後が非空白なら空白を挿入
+      result += '**'
+      const nextPart = parts[i]
+      if (nextPart.length > 0 && !/^\s/.test(nextPart)) {
+        result += ' '
+      }
+      inBold = false
+    }
+
+    result += parts[i]
+  }
+
   return result
 }

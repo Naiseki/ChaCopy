@@ -41,7 +41,7 @@ function waitForCopyButton(article: HTMLElement): void {
     return
   }
 
-  // Copy button appears when streaming finishes - watch for it
+  // コピーボタンはストリーミング完了時に出現する。それを待って注入する。
   const innerObserver = new MutationObserver((_mutations, obs) => {
     if (article.querySelector(COPY_BTN_SELECTOR)) {
       obs.disconnect()
