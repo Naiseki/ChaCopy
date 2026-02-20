@@ -2,7 +2,7 @@
  * Turndown 出力の Markdown に後処理を適用する。
  *
  * 変換内容:
- * 1. 太字正規化: ** の前後に空白を確保（日本語 Markdown パーサー向け）
+ * 1. 太字正規化: CommonMark の delimiter run 判定が壊れる場合に ** の前後に空白を挿入
  *
  * @param markdown - Turndown の出力 Markdown 文字列
  * @returns 後処理済みの Markdown 文字列
@@ -13,6 +13,11 @@ export function postprocess(markdown: string): string {
 
 /**
  * Markdown の太字マーカー（**）の前後に空白を追加する。
+ *
+ * CommonMark では ** の開閉に left-flanking / right-flanking delimiter run の
+ * 判定が使われる。太字内容の先頭・末尾が Punctuation Character の場合、
+ * 外側が空白でも Punctuation でもないと delimiter run 条件が崩れるため、
+ * その場合のみスペースを補間する。Punctuation が絡まないケースでは元の構造を保持する。
  *
  * 以下の範囲では変換をスキップ:
  * - フェンスコードブロック (```...```)
@@ -28,8 +33,10 @@ export function postprocess(markdown: string): string {
  */
 export function normalizeBold(markdown: string): string {
     const segments = splitProtectedSegments(markdown);
-    // 空白・改行・Markdown 特殊文字（*_~）に隣接する場合はスペース挿入不要
-    const noAddSpace = /[\s\n*_~]/;
+    // CommonMark Unicode punctuation character:
+    // ASCII punctuation (U+0021–002F, U+003A–0040, U+005B–0060, U+007B–007E)
+    // plus Unicode categories Pc, Pd, Pe, Pf, Pi, Po, Ps
+    const punctRe = /[\u0021-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u007E\p{P}]/u;
 
     let result = '';
     let inBold = false;
@@ -50,31 +57,38 @@ export function normalizeBold(markdown: string): string {
             }
 
             if (!inBold) {
-                // 開き **: 以下の場合のみ前にスペースを挿入
-                //   - result が空でない
-                //   - 直前が非スペース非特殊文字
-                //   - bold の内容が空でない（**** のような空 bold を跨ぐ場合を除外）
+                // 開き **: 太字内容の先頭が Punctuation で、
+                // 直前が空白でも Punctuation でもない場合のみスペース挿入
+                // （LF 条件2: "followed by punct → preceded by ws/punct" が崩れる場合の補正）
                 const boldContent = parts[i];
+                const lastChar = result.slice(-1);
+                const firstBoldChar = boldContent[0] ?? '';
                 if (
                     result.length > 0 &&
                     boldContent.length > 0 &&
-                    !noAddSpace.test(result.slice(-1))
+                    punctRe.test(firstBoldChar) &&
+                    !/\s/.test(lastChar) &&
+                    !punctRe.test(lastChar)
                 ) {
                     result += ' ';
                 }
                 result += '**';
                 inBold = true;
             } else {
-                // 閉じ **: 以下の場合のみ後にスペースを挿入
-                //   - bold の内容が空でない（**** のような空 bold を跨ぐ場合を除外）
-                //   - 直後が非スペース非特殊文字
+                // 閉じ **: 太字内容の末尾が Punctuation で、
+                // 直後が空白でも Punctuation でもない場合のみスペース挿入
+                // （RF 条件2: "preceded by punct → followed by ws/punct" が崩れる場合の補正）
                 result += '**';
                 const boldContent = parts[i - 1];
                 const nextPart = parts[i];
+                const lastBoldChar = boldContent.slice(-1);
+                const firstNextChar = nextPart[0] ?? '';
                 if (
                     boldContent.length > 0 &&
                     nextPart.length > 0 &&
-                    !noAddSpace.test(nextPart[0])
+                    punctRe.test(lastBoldChar) &&
+                    !/\s/.test(firstNextChar) &&
+                    !punctRe.test(firstNextChar)
                 ) {
                     result += ' ';
                 }

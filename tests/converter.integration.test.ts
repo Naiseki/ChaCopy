@@ -41,12 +41,14 @@ describe('domToMarkdown 統合テスト', () => {
         expect(md).toContain('$$\\sum_{i=0}^n i$$');
     });
 
-    it('日本語に隣接する太字の前後に空白を付与する', () => {
+    it('Punctuation が隣接しない太字はスペースを挿入しない', () => {
         const el = makeMessageContent(
             '<p>これは<strong>重要</strong>です</p>'
         );
         const md = domToMarkdown(el);
-        expect(md).toContain(' **重要** ');
+        expect(md).toContain('**重要**');
+        // 不要なスペースが挿入されていないことを確認
+        expect(md).not.toContain(' **重要** ');
     });
 
     it('インラインコード内の太字は変更しない', () => {
@@ -79,23 +81,25 @@ describe('domToMarkdown 統合テスト', () => {
         expect(md).toContain('B');
     });
 
-    it('KaTeX と太字正規化を組み合わせて処理する', () => {
+    it('KaTeX と太字を組み合わせて処理する（Punctuation なし）', () => {
         const el = makeMessageContent(
             '<p>式<span class="katex"><annotation encoding="application/x-tex">x^2</annotation></span>で<strong>重要</strong>です</p>'
         );
         const md = domToMarkdown(el);
         expect(md).toContain('$x^2$');
-        expect(md).toContain(' **重要** ');
+        expect(md).toContain('**重要**');
+        expect(md).not.toContain(' **重要** ');
     });
 
-    it('括弧で終わる複数の太字スパンをエスケープせず変換する', () => {
+    it('括弧で終わる太字スパンの直後に非 Punctuation が続く場合スペースを挿入する', () => {
         const el = makeMessageContent(
             '<p>は<strong>確率密度関数（PDF）</strong>または離散なら<strong>確率質量関数（PMF）</strong>です。</p>'
         );
         const md = domToMarkdown(el);
         // \\*\\* にエスケープされていないこと
         expect(md).not.toContain('\\*');
-        expect(md).toContain('**確率密度関数（PDF）**');
-        expect(md).toContain('**確率質量関数（PMF）**');
+        // 太字内容末尾の ）(Punctuation) の直後が非空白・非 Punctuation の場合スペースが入る
+        expect(md).toContain('**確率密度関数（PDF）** または');
+        expect(md).toContain('**確率質量関数（PMF）** です');
     });
 });

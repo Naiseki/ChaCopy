@@ -2,12 +2,12 @@ import { describe, it, expect } from 'vitest';
 import { normalizeBold, splitProtectedSegments } from '../src/converter/postprocessor';
 
 describe('normalizeBold', () => {
-    it('日本語に隣接する ** の前後に空白を追加する', () => {
-        expect(normalizeBold('日本語**重要**です')).toBe('日本語 **重要** です');
+    it('Punctuation が隣接しない ** はそのまま保持する', () => {
+        expect(normalizeBold('日本語**太字**です')).toBe('日本語**太字**です');
     });
 
-    it('既に空白がある場合は二重に追加しない', () => {
-        expect(normalizeBold('日本語 **重要** です')).toBe('日本語 **重要** です');
+    it('既に空白がある場合はそのまま保持する', () => {
+        expect(normalizeBold('日本語 **太字** です')).toBe('日本語 **太字** です');
     });
 
     it('行頭の太字は変更しない', () => {
@@ -18,21 +18,21 @@ describe('normalizeBold', () => {
         expect(normalizeBold('at end **Bold**')).toBe('at end **Bold**');
     });
 
-    it('複数の太字スパンを正しく処理する', () => {
-        expect(normalizeBold('A**B**C**D**E')).toBe('A **B** C **D** E');
+    it('Punctuation が隣接しない複数の太字スパンはそのまま保持する', () => {
+        expect(normalizeBold('A**B**C**D**E')).toBe('A**B**C**D**E');
     });
 
-    it('エスケープを正しく処理する', () => {
-        expect(normalizeBold('これは\\*\\*太字\\*\\*です')).toBe('これは **太字** です');
+    it('エスケープを解除して ** に復元する', () => {
+        expect(normalizeBold('これは\\*\\*太字\\*\\*です')).toBe('これは**太字**です');
     });
 
     it('フェンスコードブロック内の太字は変換しない', () => {
-        const input = '```\n日本語**重要**\n```';
+        const input = '```\n日本語**太字**\n```';
         expect(normalizeBold(input)).toBe(input);
     });
 
     it('インラインコード内の太字は変換しない', () => {
-        const input = 'text `日本語**重要**` text';
+        const input = 'text `日本語**太字**` text';
         expect(normalizeBold(input)).toBe(input);
     });
 
@@ -46,10 +46,58 @@ describe('normalizeBold', () => {
         expect(normalizeBold(input)).toBe(input);
     });
 
-    it('保護区間の外側の太字のみ正規化する', () => {
-        const input = 'text `code` 日本語**重要**です';
-        expect(normalizeBold(input)).toBe('text `code` 日本語 **重要** です');
+    it('保護区間の外側の太字はそのまま保持する（Punctuation なし）', () => {
+        const input = 'text `code` 日本語**太字**です';
+        expect(normalizeBold(input)).toBe('text `code` 日本語**太字**です');
     });
+
+    // Punctuation 隣接時のスペース挿入テスト
+    const punctuationChars = ['。', '、', '？', '！', '”', '＃', '＆', '（', '）', '［', '］', '｛', '｝', '〈', '〉', '《', '》', '「', '」', '『', '』', '【', '】', '・', '…', '‥', '＠', '＿', '／', '＼', '：', '；', '＂', '＇', '＃', '％', '＊'];
+
+    punctuationChars.forEach(punctuation => {
+        it(`太字内容の末尾が Punctuation（${punctuation}）で直後が非空白・非 Punctuation ならスペースを挿入する`, () => {
+            const input = `は**太字${punctuation}**または`;
+            const expected = `は**太字${punctuation}** または`;
+            expect(normalizeBold(input)).toBe(expected);
+        });
+
+        it(`太字内容の先頭が Punctuation（${punctuation}）で直前が非空白・非 Punctuation ならスペースを挿入する`, () => {
+            const input = `テスト**${punctuation}太字**です`;
+            const expected = `テスト **${punctuation}太字**です`;
+            expect(normalizeBold(input)).toBe(expected);
+        });
+
+        it(`太字内容の先頭・末尾ともに Punctuation（${punctuation}）なら前後にスペースを挿入する`, () => {
+            expect(normalizeBold(`テスト**${punctuation}太字${punctuation}**です`))
+                .toBe(`テスト **${punctuation}太字${punctuation}** です`);
+        });
+
+        it('太字の内部に Punctuation があってもスペースを挿入しない', () => {
+            expect(normalizeBold(`テスト**太字${punctuation}内**です`))
+                .toBe(`テスト**太字${punctuation}内**です`);
+        });
+
+        it('太字内容の末尾が Punctuation でも直後が Punctuation なら挿入しない', () => {
+            expect(normalizeBold(`は**確率密度関数${punctuation}**。`))
+                .toBe(`は**確率密度関数${punctuation}**。`);
+        });
+
+        it('太字内容の末尾が Punctuation でも直後が空白なら挿入しない', () => {
+            expect(normalizeBold(`は**確率密度関数${punctuation}** テスト`))
+                .toBe(`は**確率密度関数${punctuation}** テスト`);
+        });
+
+        it('太字内容の先頭が Punctuation でも直前が Punctuation なら挿入しない', () => {
+            expect(normalizeBold(`「**${punctuation}太字${punctuation}**です」`))
+                .toBe(`「**${punctuation}太字${punctuation}** です」`);
+        });
+
+        it('複数の Punctuation 終端太字スパンを正しく処理する', () => {
+            expect(normalizeBold(`は**確率密度関数${punctuation}**または離散なら**確率質量関数${punctuation}**です`))
+                .toBe(`は**確率密度関数${punctuation}** または離散なら**確率質量関数${punctuation}** です`);
+        });
+    });
+
 });
 
 describe('splitProtectedSegments', () => {
