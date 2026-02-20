@@ -52,7 +52,21 @@ describe('normalizeBold', () => {
     });
 
     // Punctuation 隣接時のスペース挿入テスト
-    const punctuationChars = ['。', '、', '？', '！', '”', '＃', '＆', '（', '）', '［', '］', '｛', '｝', '〈', '〉', '《', '》', '「', '」', '『', '』', '【', '】', '・', '…', '‥', '＠', '＿', '／', '＼', '：', '；', '＂', '＇', '＃', '％', '＊'];
+    const punctuationChars = [
+        // ASCII
+        '!', '"', '#', '%', '&', "'", '(', ')', '+', ',', '-', '.', '/',
+        ':', ';', '<', '=', '>', '?', '@',
+        '[', '\\', ']', '^', '_',
+        '{', '|', '}', '~',
+
+        // Unicode categories Pc, Pd, Ps, Pe, Pi, Pf, Po (representative examples)
+        '！', '？', '。', '、', '…', '：', '；',
+        '（', '）', '［', '］', '｛', '｝',
+        '「', '」', '『', '』', '‹', '›',
+        '“', '”', '‘', '’', '«', '»',
+        '—', '–', '-', '‒', '―',
+        '·', '•', '…', '‼', '‽',
+    ];
 
     punctuationChars.forEach(punctuation => {
         it(`太字内容の末尾が Punctuation（${punctuation}）で直後が非空白・非 Punctuation ならスペースを挿入する`, () => {
@@ -72,27 +86,27 @@ describe('normalizeBold', () => {
                 .toBe(`テスト **${punctuation}太字${punctuation}** です`);
         });
 
-        it('太字の内部に Punctuation があってもスペースを挿入しない', () => {
+        it(`太字の内部に Punctuation（${punctuation}）があってもスペースを挿入しない`, () => {
             expect(normalizeBold(`テスト**太字${punctuation}内**です`))
                 .toBe(`テスト**太字${punctuation}内**です`);
         });
 
-        it('太字内容の末尾が Punctuation でも直後が Punctuation なら挿入しない', () => {
+        it(`太字内容の末尾が Punctuation（${punctuation}）でも直後が Punctuation なら挿入しない`, () => {
             expect(normalizeBold(`は**確率密度関数${punctuation}**。`))
                 .toBe(`は**確率密度関数${punctuation}**。`);
         });
 
-        it('太字内容の末尾が Punctuation でも直後が空白なら挿入しない', () => {
+        it(`太字内容の末尾が Punctuation（${punctuation}）でも直後が空白なら挿入しない`, () => {
             expect(normalizeBold(`は**確率密度関数${punctuation}** テスト`))
                 .toBe(`は**確率密度関数${punctuation}** テスト`);
         });
 
-        it('太字内容の先頭が Punctuation でも直前が Punctuation なら挿入しない', () => {
+        it(`太字内容の先頭が Punctuation（${punctuation}）でも直前が Punctuation なら挿入しない`, () => {
             expect(normalizeBold(`「**${punctuation}太字${punctuation}**です」`))
                 .toBe(`「**${punctuation}太字${punctuation}** です」`);
         });
 
-        it('複数の Punctuation 終端太字スパンを正しく処理する', () => {
+        it(`複数の Punctuation（${punctuation}） 終端太字スパンを正しく処理する`, () => {
             expect(normalizeBold(`は**確率密度関数${punctuation}**または離散なら**確率質量関数${punctuation}**です`))
                 .toBe(`は**確率密度関数${punctuation}** または離散なら**確率質量関数${punctuation}** です`);
         });
