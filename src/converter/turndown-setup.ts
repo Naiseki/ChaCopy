@@ -1,7 +1,7 @@
-import TurndownService from 'turndown'
-import { gfm } from 'turndown-plugin-gfm'
+import TurndownService from 'turndown';
+import { gfm } from 'turndown-plugin-gfm';
 
-let _service: TurndownService | null = null
+let _service: TurndownService | null = null;
 
 /**
  * Turndown の設定済みシングルトンインスタンスを取得する。
@@ -16,7 +16,7 @@ let _service: TurndownService | null = null
  * @returns 設定済みの TurndownService インスタンス
  */
 export function getTurndownService(): TurndownService {
-    if (_service) return _service
+    if (_service) return _service;
 
     const service = new TurndownService({
         headingStyle: 'atx',
@@ -25,10 +25,10 @@ export function getTurndownService(): TurndownService {
         fence: '```',
         strongDelimiter: '**',
         emDelimiter: '*',
-    })
+    });
 
     // GFM プラグイン: テーブル (| col | col |) と取消線を追加
-    service.use(gfm)
+    service.use(gfm);
 
     // 数式パススルールール: textContent をエスケープせずそのまま返す。
     // gfm より後に追加することで優先度が高くなる。
@@ -37,21 +37,21 @@ export function getTurndownService(): TurndownService {
             return (
                 node.nodeName === 'SPAN' &&
                 (node as Element).hasAttribute('data-chappymd-math')
-            )
+            );
         },
         replacement(_content, node) {
-            return (node as Element).textContent ?? ''
+            return (node as Element).textContent ?? '';
         },
-    })
+    });
 
     // <br> を改行に変換
     service.addRule('linebreak', {
         filter: ['br'],
         replacement() {
-            return '\n'
+            return '\n';
         },
-    })
+    });
 
-    _service = service
-    return service
+    _service = service;
+    return service;
 }

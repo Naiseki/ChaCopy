@@ -6,8 +6,8 @@
  * 2. 新しいメッセージの追加を監視し、即座にボタンを注入開始
  */
 
-import { injectButtonsIntoPage } from './ui/button'
-import { startObserver } from './ui/observer'
+import { injectButtonsIntoPage } from './ui/button';
+import { startObserver } from './ui/observer';
 
-injectButtonsIntoPage()
-startObserver()
+injectButtonsIntoPage();
+startObserver();

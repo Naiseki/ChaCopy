@@ -3,7 +3,7 @@ import tseslint from 'typescript-eslint';
 
 export default [
   {
-    ignores: ['dist/**', 'node_modules/**', '**/*.js'],
+    ignores: ['dist/**', 'node_modules/**', '**/*.js', 'vite.config.ts'],  // JSファイルとVite設定ファイルを除外
   },
   eslint.configs.recommended,
   ...tseslint.configs.recommended,

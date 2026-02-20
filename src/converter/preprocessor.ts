@@ -10,10 +10,10 @@
  * @returns 前処理済みの HTMLElement（クローン）
  */
 export function preprocessNode(node: HTMLElement): HTMLElement {
-    const clone = node.cloneNode(true) as HTMLElement
-    replaceKatexNodes(clone)
-    removeUiChrome(clone)
-    return clone
+    const clone = node.cloneNode(true) as HTMLElement;
+    replaceKatexNodes(clone);
+    removeUiChrome(clone);
+    return clone;
 }
 
 /**
@@ -33,29 +33,29 @@ function replaceKatexNodes(root: HTMLElement): void {
     // 先に処理することで内部の span.katex が後続のインライン処理で重複マッチしない。
     const displaySpans = Array.from(
         root.querySelectorAll<HTMLElement>('span.katex-display')
-    )
+    );
     for (const display of displaySpans) {
         const annotation = display.querySelector(
             'annotation[encoding="application/x-tex"]'
-        )
-        if (!annotation) continue
-        const latex = annotation.textContent?.trim() ?? ''
-        const replacement = createMathNode(`\n\n$$${latex}$$\n\n`, root)
-        display.replaceWith(replacement)
+        );
+        if (!annotation) continue;
+        const latex = annotation.textContent?.trim() ?? '';
+        const replacement = createMathNode(`\n\n$$${latex}$$\n\n`, root);
+        display.replaceWith(replacement);
     }
 
     // 残りのインライン数式（katex-display に含まれないもの）を処理
     const inlineSpans = Array.from(
         root.querySelectorAll<HTMLElement>('span.katex')
-    )
+    );
     for (const span of inlineSpans) {
         const annotation = span.querySelector(
             'annotation[encoding="application/x-tex"]'
-        )
-        if (!annotation) continue
-        const latex = annotation.textContent?.trim() ?? ''
-        const replacement = createMathNode(`$${latex}$`, root)
-        span.replaceWith(replacement)
+        );
+        if (!annotation) continue;
+        const latex = annotation.textContent?.trim() ?? '';
+        const replacement = createMathNode(`$${latex}$`, root);
+        span.replaceWith(replacement);
     }
 }
 
@@ -72,11 +72,11 @@ function replaceKatexNodes(root: HTMLElement): void {
  * @returns 数式を格納し、マーカー属性を持つ HTMLSpanElement
  */
 function createMathNode(content: string, contextNode: HTMLElement): HTMLSpanElement {
-    const doc = contextNode.ownerDocument ?? document
-    const span = doc.createElement('span')
-    span.setAttribute('data-chappymd-math', 'true')
-    span.textContent = content
-    return span
+    const doc = contextNode.ownerDocument ?? document;
+    const span = doc.createElement('span');
+    span.setAttribute('data-chappymd-math', 'true');
+    span.textContent = content;
+    return span;
 }
 
 /**
@@ -91,6 +91,6 @@ function createMathNode(content: string, contextNode: HTMLElement): HTMLSpanElem
  */
 function removeUiChrome(root: HTMLElement): void {
     for (const el of root.querySelectorAll('[data-footnotes], .citation, sup')) {
-        el.remove()
+        el.remove();
     }
 }

@@ -8,7 +8,7 @@
  * @returns 後処理済みの Markdown 文字列
  */
 export function postprocess(markdown: string): string {
-    return normalizeBold(markdown)
+    return normalizeBold(markdown);
 }
 
 /**
@@ -24,13 +24,13 @@ export function postprocess(markdown: string): string {
  * @returns 太字が正規化された Markdown 文字列
  */
 export function normalizeBold(markdown: string): string {
-    const segments = splitProtectedSegments(markdown)
+    const segments = splitProtectedSegments(markdown);
 
     return segments
         .map(({ text, protected: isProtected }) =>
             isProtected ? text : applyBoldNormalization(text)
         )
-        .join('')
+        .join('');
 }
 
 type Segment = { text: string; protected: boolean }
@@ -48,9 +48,9 @@ type Segment = { text: string; protected: boolean }
  * @returns 保護区間フラグ付きセグメントの配列
  */
 export function splitProtectedSegments(input: string): Segment[] {
-    const segments: Segment[] = []
-    let pos = 0
-    let normalStart = 0
+    const segments: Segment[] = [];
+    let pos = 0;
+    let normalStart = 0;
 
     while (pos < input.length) {
         // フェンスコードブロック: 行頭で開始
@@ -59,14 +59,14 @@ export function splitProtectedSegments(input: string): Segment[] {
             input.startsWith('```', pos)
         ) {
             if (pos > normalStart) {
-                segments.push({ text: input.slice(normalStart, pos), protected: false })
+                segments.push({ text: input.slice(normalStart, pos), protected: false });
             }
-            const closeIdx = input.indexOf('\n```', pos + 3)
-            const closeEnd = closeIdx === -1 ? input.length : closeIdx + 4
-            segments.push({ text: input.slice(pos, closeEnd), protected: true })
-            pos = closeEnd
-            normalStart = pos
-            continue
+            const closeIdx = input.indexOf('\n```', pos + 3);
+            const closeEnd = closeIdx === -1 ? input.length : closeIdx + 4;
+            segments.push({ text: input.slice(pos, closeEnd), protected: true });
+            pos = closeEnd;
+            normalStart = pos;
+            continue;
         }
 
         // ブロック数式: 行頭の $$...$$
@@ -75,51 +75,51 @@ export function splitProtectedSegments(input: string): Segment[] {
             input.startsWith('$$', pos)
         ) {
             if (pos > normalStart) {
-                segments.push({ text: input.slice(normalStart, pos), protected: false })
+                segments.push({ text: input.slice(normalStart, pos), protected: false });
             }
-            const closeIdx = input.indexOf('$$', pos + 2)
-            const closeEnd = closeIdx === -1 ? input.length : closeIdx + 2
-            segments.push({ text: input.slice(pos, closeEnd), protected: true })
-            pos = closeEnd
-            normalStart = pos
-            continue
+            const closeIdx = input.indexOf('$$', pos + 2);
+            const closeEnd = closeIdx === -1 ? input.length : closeIdx + 2;
+            segments.push({ text: input.slice(pos, closeEnd), protected: true });
+            pos = closeEnd;
+            normalStart = pos;
+            continue;
         }
 
         // インラインコード: `...`
         if (input[pos] === '`' && input[pos + 1] !== '`') {
             if (pos > normalStart) {
-                segments.push({ text: input.slice(normalStart, pos), protected: false })
+                segments.push({ text: input.slice(normalStart, pos), protected: false });
             }
-            const closeIdx = input.indexOf('`', pos + 1)
-            const closeEnd = closeIdx === -1 ? input.length : closeIdx + 1
-            segments.push({ text: input.slice(pos, closeEnd), protected: true })
-            pos = closeEnd
-            normalStart = pos
-            continue
+            const closeIdx = input.indexOf('`', pos + 1);
+            const closeEnd = closeIdx === -1 ? input.length : closeIdx + 1;
+            segments.push({ text: input.slice(pos, closeEnd), protected: true });
+            pos = closeEnd;
+            normalStart = pos;
+            continue;
         }
 
         // インライン数式: $...$ （$$ ではない）
         if (input[pos] === '$' && input[pos + 1] !== '$') {
             if (pos > normalStart) {
-                segments.push({ text: input.slice(normalStart, pos), protected: false })
+                segments.push({ text: input.slice(normalStart, pos), protected: false });
             }
-            const closeIdx = input.indexOf('$', pos + 1)
-            const closeEnd = closeIdx === -1 ? input.length : closeIdx + 1
-            segments.push({ text: input.slice(pos, closeEnd), protected: true })
-            pos = closeEnd
-            normalStart = pos
-            continue
+            const closeIdx = input.indexOf('$', pos + 1);
+            const closeEnd = closeIdx === -1 ? input.length : closeIdx + 1;
+            segments.push({ text: input.slice(pos, closeEnd), protected: true });
+            pos = closeEnd;
+            normalStart = pos;
+            continue;
         }
 
-        pos++
+        pos++;
     }
 
     // 残りの通常テキストを追加
     if (normalStart < input.length) {
-        segments.push({ text: input.slice(normalStart), protected: false })
+        segments.push({ text: input.slice(normalStart), protected: false });
     }
 
-    return segments
+    return segments;
 }
 
 /**
@@ -133,41 +133,41 @@ export function splitProtectedSegments(input: string): Segment[] {
  */
 function applyBoldNormalization(text: string): string {
     // ** をエスケープ解除
-    text = text.replace(/\\\*\\\*/g, '**')
+    text = text.replace(/\\\*\\\*/g, '**');
 
     // ** で分割し、開き/閉じを交互に判定する
-    const parts = text.split('**')
-    if (parts.length < 3) return text // 完全な太字スパンなし
+    const parts = text.split('**');
+    if (parts.length < 3) return text; // 完全な太字スパンなし
 
-    let result = ''
-    let inBold = false
+    let result = '';
+    let inBold = false;
 
     for (let i = 0; i < parts.length; i++) {
         if (i === 0) {
-            result += parts[i]
-            continue
+            result += parts[i];
+            continue;
         }
 
         if (!inBold) {
             // 開き **: 直前が非空白なら空白を挿入
             if (result.length > 0 && !/\s$/.test(result)) {
-                result += ' '
+                result += ' ';
             }
-            result += '**'
-            inBold = true
+            result += '**';
+            inBold = true;
         } else {
             // 閉じ **: 直後が非空白なら空白を挿入
-            result += '**'
-            const nextPart = parts[i]
+            result += '**';
+            const nextPart = parts[i];
             if (nextPart.length > 0 && !/^\s/.test(nextPart)) {
-                result += ' '
+                result += ' ';
             }
-            inBold = false
+            inBold = false;
         }
 
-        result += parts[i]
+        result += parts[i];
     }
 
-    return result
+    return result;
 }
 

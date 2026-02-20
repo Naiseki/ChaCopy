@@ -1,6 +1,6 @@
-import { preprocessNode } from './preprocessor'
-import { getTurndownService } from './turndown-setup'
-import { postprocess } from './postprocessor'
+import { preprocessNode } from './preprocessor';
+import { getTurndownService } from './turndown-setup';
+import { postprocess } from './postprocessor';
 
 /**
  * ChatGPT メッセージの DOM ノードを Markdown に変換する。
@@ -16,8 +16,8 @@ import { postprocess } from './postprocessor'
  * @returns クリーンな Markdown 文字列
  */
 export function domToMarkdown(contentNode: HTMLElement): string {
-    const processedNode = preprocessNode(contentNode)
-    const service = getTurndownService()
-    const rawMarkdown = service.turndown(processedNode)
-    return postprocess(rawMarkdown)
+    const processedNode = preprocessNode(contentNode);
+    const service = getTurndownService();
+    const rawMarkdown = service.turndown(processedNode);
+    return postprocess(rawMarkdown);
 }
