@@ -20,17 +20,56 @@ export function postprocess(markdown: string): string {
  * - ブロック数式 ($$...$$)
  * - インライン数式 ($...$)
  *
+ * 保護セグメントをまたぐ bold span（例: **`code` text**）も正しく処理するため、
+ * inBold 状態をセグメント間で共有しながら一本のパスで処理する。
+ *
  * @param markdown - 処理対象の Markdown 文字列
  * @returns 太字が正規化された Markdown 文字列
  */
 export function normalizeBold(markdown: string): string {
     const segments = splitProtectedSegments(markdown);
+    const noSpaceChars = /[\s\n]/;
 
-    return segments
-        .map(({ text, protected: isProtected }) =>
-            isProtected ? text : applyBoldNormalization(text)
-        )
-        .join('');
+    let result = '';
+    let inBold = false;
+
+    for (const { text, protected: isProtected } of segments) {
+        if (isProtected) {
+            result += text;
+            continue;
+        }
+
+        // エスケープ解除してから ** で分割
+        const parts = text.replace(/\\\*\\\*/g, '**').split('**');
+
+        for (let i = 0; i < parts.length; i++) {
+            if (i === 0) {
+                result += parts[i];
+                continue;
+            }
+
+            if (!inBold) {
+                // 開き **: 直前が非スペースなら空白を挿入
+                if (result.length > 0 && !noSpaceChars.test(result.slice(-1))) {
+                    result += ' ';
+                }
+                result += '**';
+                inBold = true;
+            } else {
+                // 閉じ **: 直後が非スペースなら空白を挿入
+                result += '**';
+                const nextPart = parts[i];
+                if (nextPart.length > 0 && !noSpaceChars.test(nextPart[0])) {
+                    result += ' ';
+                }
+                inBold = false;
+            }
+
+            result += parts[i];
+        }
+    }
+
+    return result;
 }
 
 type Segment = { text: string; protected: boolean }
@@ -120,57 +159,5 @@ export function splitProtectedSegments(input: string): Segment[] {
     }
 
     return segments;
-}
-
-/**
- * テキストの太字マーカー（**）の前後に空白を挿入する。
- *
- * ** で分割し、開き/閉じを交互に判定することで、
- * 開き ** と閉じ ** を正しく区別する。
- *
- * @param text - 処理対象のテキスト
- * @returns 太字が正規化されたテキスト
- */
-function applyBoldNormalization(text: string): string {
-    // ** をエスケープ解除
-    text = text.replace(/\\\*\\\*/g, '**');
-
-    // ** で分割し、開き/閉じを交互に判定する
-    const parts = text.split('**');
-    if (parts.length < 3) return text; // 完全な太字スパンなし
-
-    let result = '';
-    let inBold = false;
-    // スペースを追加しなくてよい文字（空白、改行）
-    const noSpaceChars = /[\s\n]/;
-
-    for (let i = 0; i < parts.length; i++) {
-        if (i === 0) {
-            result += parts[i];
-            continue;
-        }
-
-        if (!inBold) {
-            // 開き **: 直前が特定の文字以外なら空白を挿入
-            if (result.length > 0 && !noSpaceChars.test(result.slice(-1))) {
-                result += ' ';
-            }
-            result += '**';
-            inBold = true;
-        } else {
-            // 閉じ **
-            result += '**';
-            const nextPart = parts[i];
-            // 直後が特定の文字以外なら空白を挿入
-            if (nextPart.length > 0 && !noSpaceChars.test(nextPart[0])) {
-                result += ' ';
-            }
-            inBold = false;
-        }
-
-        result += parts[i];
-    }
-
-    return result;
 }
 
