@@ -25,7 +25,7 @@ export function getTurndownService(): TurndownService {
         codeBlockStyle: 'fenced',
         fence: '```',
         strongDelimiter: '**',
-        emDelimiter: '*',
+        emDelimiter: '_',
     });
 
     // GFM プラグイン: テーブル (| col | col |) と取消線を追加
