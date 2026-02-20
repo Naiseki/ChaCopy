@@ -20,6 +20,7 @@ export function getTurndownService(): TurndownService {
 
     const service = new TurndownService({
         headingStyle: 'atx',
+        hr: '---',
         bulletListMarker: '-',
         codeBlockStyle: 'fenced',
         fence: '```',

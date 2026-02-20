@@ -141,6 +141,8 @@ function applyBoldNormalization(text: string): string {
 
     let result = '';
     let inBold = false;
+    // スペースを追加しなくてよい文字（空白、改行）
+    const noSpaceChars = /[\s\n]/;
 
     for (let i = 0; i < parts.length; i++) {
         if (i === 0) {
@@ -149,17 +151,18 @@ function applyBoldNormalization(text: string): string {
         }
 
         if (!inBold) {
-            // 開き **: 直前が非空白なら空白を挿入
-            if (result.length > 0 && !/\s$/.test(result)) {
+            // 開き **: 直前が特定の文字以外なら空白を挿入
+            if (result.length > 0 && !noSpaceChars.test(result.slice(-1))) {
                 result += ' ';
             }
             result += '**';
             inBold = true;
         } else {
-            // 閉じ **: 直後が非空白なら空白を挿入
+            // 閉じ **
             result += '**';
             const nextPart = parts[i];
-            if (nextPart.length > 0 && !/^\s/.test(nextPart)) {
+            // 直後が特定の文字以外なら空白を挿入
+            if (nextPart.length > 0 && !noSpaceChars.test(nextPart[0])) {
                 result += ' ';
             }
             inBold = false;

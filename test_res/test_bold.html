@@ -1,0 +1,90 @@
+<div class="markdown prose dark:prose-invert w-full wrap-break-word dark markdown-new-styling"><p data-start="0" data-end="67">結論から言うと <strong data-start="8" data-end="43"><code data-start="10" data-end="33">collection-latexextra</code> はかなりデカい</strong>。<br data-start="44" data-end="47">
+体感と実測ベースで、だいたいこのレンジ。</p>
+<hr data-start="69" data-end="72">
+<h2 data-start="74" data-end="124">collection-latexextra のサイズ感（TeX Live 2024–2025）</h2>
+<ul data-start="126" data-end="195">
+<li data-start="126" data-end="156">
+<p data-start="128" data-end="156"><strong data-start="128" data-end="139">ダウンロード量</strong>：約 <strong data-start="142" data-end="156">600〜800 MB</strong></p>
+</li>
+<li data-start="157" data-end="195">
+<p data-start="159" data-end="195"><strong data-start="159" data-end="178">インストール後のディスク使用量</strong>：約 <strong data-start="181" data-end="195">1.2〜1.6 GB</strong></p>
+</li>
+</ul>
+<p data-start="197" data-end="200">理由：</p>
+<ul data-start="201" data-end="297">
+<li data-start="201" data-end="256">
+<p data-start="203" data-end="256">fancybox / titlesec / geometry / tcolorbox / listings</p>
+</li>
+<li data-start="257" data-end="265">
+<p data-start="259" data-end="265">フォント補助</p>
+</li>
+<li data-start="266" data-end="297">
+<p data-start="268" data-end="297">使われなくても依存で引っ張られる大量の sty / cls</p>
+</li>
+</ul>
+<p data-start="299" data-end="327">👉 **「全部入りの雑多セット」**という理解でOK。</p>
+<hr data-start="329" data-end="332">
+<h2 data-start="334" data-end="366">今回の用途（jsarticle + platex）との相性</h2>
+<p data-start="368" data-end="375">正直に言うと：</p>
+<ul data-start="377" data-end="439">
+<li data-start="377" data-end="387">
+<p data-start="379" data-end="387">❌ <strong data-start="381" data-end="387">過剰</strong></p>
+</li>
+<li data-start="388" data-end="407">
+<p data-start="390" data-end="407">✅ fancybox だけなら不要</p>
+</li>
+<li data-start="408" data-end="439">
+<p data-start="410" data-end="439">✅ 日本語論文用途なら <em data-start="422" data-end="439">入れなくても困らないことが多い</em></p>
+</li>
+</ul>
+<hr data-start="441" data-end="444">
+<h2 data-start="446" data-end="462">代替：最小構成（おすすめ）</h2>
+<p data-start="464" data-end="473">今回のエラー原因が</p>
+<pre class="overflow-visible! px-0!" data-start="475" data-end="526"><div class="w-full my-4"><div class=""><div class="relative"><div class="h-full min-h-0 min-w-0"><div class="h-full min-h-0 min-w-0" style="width: 100%; transform: none;"><div class="border corner-superellipse/1.1 border-token-border-light bg-token-bg-elevated-secondary rounded-3xl"><div class="sticky z-2 select-none top-(--sticky-padding-top)"><div class="flex w-full items-center justify-between py-1.5 ps-4 pe-1.5 font-sans md:ps-5 corner-superellipse/1.1 bg-token-bg-elevated-secondary rounded-3xl"><div class="flex max-w-[75%] min-w-0 cursor-default items-center text-sm font-medium justify-self-start text-token-text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm me-2.5 shrink-0"><use href="/cdn/assets/sprites-core-jxe2m7va.svg#e45ab3" fill="currentColor"></use></svg>コード</div><div class="flex flex-row gap-0.5 justify-self-end"><button class="flex gap-1 items-center select-none rounded-full px-2 py-2 hover:bg-token-bg-secondary text-sm font-medium" aria-label="コピーする" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-md"><use href="/cdn/assets/sprites-core-jxe2m7va.svg#ce3544" fill="currentColor"></use></svg></button></div></div></div><div class="pointer-events-none absolute inset-x-4 top-12 bottom-4"><div class="pointer-events-none sticky z-40 shrink-0 z-1!" style="top: calc(calc(var(--sticky-padding-top) + 48px) - 1px * 3); margin-bottom: calc(-4px); height: calc(4px); mask-image: linear-gradient(transparent 25%, white 75%);"><div class="sticky bg-token-border-light" style="top: calc(var(--sticky-padding-top) + 48px); height: 1px;"></div></div></div><div class="pointer-events-none absolute inset-x-px top-0 bottom-96"><div class="pointer-events-none sticky z-40 shrink-0 z-1!" style="top: calc(var(--sticky-padding-top) - 48px * 3); margin-bottom: calc(-192px); height: calc(192px); mask-image: linear-gradient(transparent 25%, white 75%);"><div class="sticky bg-token-bg-elevated-secondary" style="top: var(--sticky-padding-top); height: 48px;"></div></div></div><div class="corner-superellipse/1.1 rounded-3xl bg-token-bg-elevated-secondary" style="transform: none;"><div class="relative z-0 flex max-w-full"><div id="code-block-viewer" dir="ltr" class="q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼk ͼy"><div class="cm-scroller"><div class="cm-content q9tKkq_readonly"><span>LaTeX Error: File `fancybox.sty' not found.</span></div></div></div></div></div></div></div></div><div class=""><div class="" style="width: 100%; transform: none;"></div></div></div></div></div></pre>
+<p data-start="528" data-end="539">なので、これで十分👇</p>
+<pre class="overflow-visible! px-0!" data-start="541" data-end="659"><div class="w-full my-4"><div class=""><div class="relative"><div class="h-full min-h-0 min-w-0"><div class="h-full min-h-0 min-w-0" style="width: 100%; transform: none;"><div class="border corner-superellipse/1.1 border-token-border-light bg-token-bg-elevated-secondary rounded-3xl"><div class="sticky z-2 select-none top-(--sticky-padding-top)"><div class="flex w-full items-center justify-between py-1.5 ps-4 pe-1.5 font-sans md:ps-5 corner-superellipse/1.1 bg-token-bg-elevated-secondary rounded-3xl"><div class="flex max-w-[75%] min-w-0 cursor-default items-center text-sm font-medium justify-self-start text-token-text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm me-2.5 shrink-0"><use href="/cdn/assets/sprites-core-jxe2m7va.svg#e45ab3" fill="currentColor"></use></svg>dockerfile</div><div class="flex flex-row gap-0.5 justify-self-end"><button class="flex gap-1 items-center select-none rounded-full px-2 py-2 hover:bg-token-bg-secondary text-sm font-medium" aria-label="コピーする" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-md"><use href="/cdn/assets/sprites-core-jxe2m7va.svg#ce3544" fill="currentColor"></use></svg></button></div></div></div><div class="pointer-events-none absolute inset-x-4 top-12 bottom-4"><div class="pointer-events-none sticky z-40 shrink-0 z-1!" style="top: calc(calc(var(--sticky-padding-top) + 48px) - 1px * 3); margin-bottom: calc(-4px); height: calc(4px); mask-image: linear-gradient(transparent 25%, white 75%);"><div class="sticky bg-token-border-light" style="top: calc(var(--sticky-padding-top) + 48px); height: 1px;"></div></div></div><div class="pointer-events-none absolute inset-x-px top-0 bottom-96"><div class="pointer-events-none sticky z-40 shrink-0 z-1!" style="top: calc(var(--sticky-padding-top) - 48px * 3); margin-bottom: calc(-192px); height: calc(192px); mask-image: linear-gradient(transparent 25%, white 75%);"><div class="sticky bg-token-bg-elevated-secondary" style="top: var(--sticky-padding-top); height: 48px;"></div></div></div><div class="corner-superellipse/1.1 rounded-3xl bg-token-bg-elevated-secondary" style="transform: none;"><div class="relative z-0 flex max-w-full"><div id="code-block-viewer" dir="ltr" class="q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼk ͼy"><div class="cm-scroller"><div class="cm-content q9tKkq_readonly"><span class="ͼn">RUN</span><span> tlmgr install \</span><br><span>    collection-langjapanese \</span><br><span>    platex \</span><br><span>    uplatex \</span><br><span>    fancybox \</span><br><span> || true</span></div></div></div></div></div></div></div></div><div class=""><div class="" style="width: 100%; transform: none;"></div></div></div></div></div></pre>
+<h3 data-start="661" data-end="673">この場合のサイズ</h3>
+<ul data-start="674" data-end="740">
+<li data-start="674" data-end="699">
+<p data-start="676" data-end="699">追加分：<strong data-start="680" data-end="699">数十 MB〜100 MB 程度</strong></p>
+</li>
+<li data-start="700" data-end="718">
+<p data-start="702" data-end="718">Docker build も速い</p>
+</li>
+<li data-start="719" data-end="740">
+<p data-start="721" data-end="740">Overleaf CE との相性も良い</p>
+</li>
+</ul>
+<hr data-start="742" data-end="745">
+<h2 data-start="747" data-end="770">サイズを正確に知りたい場合（コンテナ内）</h2>
+<pre class="overflow-visible! px-0!" data-start="772" data-end="816"><div class="w-full my-4"><div class=""><div class="relative"><div class="h-full min-h-0 min-w-0"><div class="h-full min-h-0 min-w-0" style="width: 100%; transform: none;"><div class="border corner-superellipse/1.1 border-token-border-light bg-token-bg-elevated-secondary rounded-3xl"><div class="sticky z-2 select-none top-(--sticky-padding-top)"><div class="flex w-full items-center justify-between py-1.5 ps-4 pe-1.5 font-sans md:ps-5 corner-superellipse/1.1 bg-token-bg-elevated-secondary rounded-3xl"><div class="flex max-w-[75%] min-w-0 cursor-default items-center text-sm font-medium justify-self-start text-token-text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm me-2.5 shrink-0"><use href="/cdn/assets/sprites-core-jxe2m7va.svg#e45ab3" fill="currentColor"></use></svg>Bash</div><div class="flex flex-row gap-0.5 justify-self-end"><button class="flex gap-1 items-center select-none rounded-full px-2 py-2 hover:bg-token-bg-secondary text-sm font-medium" aria-label="コピーする" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-md"><use href="/cdn/assets/sprites-core-jxe2m7va.svg#ce3544" fill="currentColor"></use></svg></button></div></div></div><div class="pointer-events-none absolute inset-x-4 top-12 bottom-4"><div class="pointer-events-none sticky z-40 shrink-0 z-1!" style="top: calc(calc(var(--sticky-padding-top) + 48px) - 1px * 3); margin-bottom: calc(-4px); height: calc(4px); mask-image: linear-gradient(transparent 25%, white 75%);"><div class="sticky bg-token-border-light" style="top: calc(var(--sticky-padding-top) + 48px); height: 1px;"></div></div></div><div class="pointer-events-none absolute inset-x-px top-0 bottom-96"><div class="pointer-events-none sticky z-40 shrink-0 z-1!" style="top: calc(var(--sticky-padding-top) - 48px * 3); margin-bottom: calc(-192px); height: calc(192px); mask-image: linear-gradient(transparent 25%, white 75%);"><div class="sticky bg-token-bg-elevated-secondary" style="top: var(--sticky-padding-top); height: 48px;"></div></div></div><div class="corner-superellipse/1.1 rounded-3xl bg-token-bg-elevated-secondary" style="transform: none;"><div class="relative z-0 flex max-w-full"><div id="code-block-viewer" dir="ltr" class="q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼk ͼy"><div class="cm-scroller"><div class="cm-content q9tKkq_readonly"><span>tlmgr info collection-latexextra</span></div></div></div></div></div></div></div></div><div class=""><div class="" style="width: 100%; transform: none;"></div></div></div></div></div></pre>
+<p data-start="818" data-end="822">または：</p>
+<pre class="overflow-visible! px-0!" data-start="824" data-end="889"><div class="w-full my-4"><div class=""><div class="relative"><div class="h-full min-h-0 min-w-0"><div class="h-full min-h-0 min-w-0" style="width: 100%; transform: none;"><div class="border corner-superellipse/1.1 border-token-border-light bg-token-bg-elevated-secondary rounded-3xl"><div class="sticky z-2 select-none top-(--sticky-padding-top)"><div class="flex w-full items-center justify-between py-1.5 ps-4 pe-1.5 font-sans md:ps-5 corner-superellipse/1.1 bg-token-bg-elevated-secondary rounded-3xl"><div class="flex max-w-[75%] min-w-0 cursor-default items-center text-sm font-medium justify-self-start text-token-text-primary"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-sm me-2.5 shrink-0"><use href="/cdn/assets/sprites-core-jxe2m7va.svg#e45ab3" fill="currentColor"></use></svg>Bash</div><div class="flex flex-row gap-0.5 justify-self-end"><button class="flex gap-1 items-center select-none rounded-full px-2 py-2 hover:bg-token-bg-secondary text-sm font-medium" aria-label="コピーする" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" aria-hidden="true" class="icon-md"><use href="/cdn/assets/sprites-core-jxe2m7va.svg#ce3544" fill="currentColor"></use></svg></button></div></div></div><div class="pointer-events-none absolute inset-x-4 top-12 bottom-4"><div class="pointer-events-none sticky z-40 shrink-0 z-1!" style="top: calc(calc(var(--sticky-padding-top) + 48px) - 1px * 3); margin-bottom: calc(-4px); height: calc(4px); mask-image: linear-gradient(transparent 25%, white 75%);"><div class="sticky bg-token-border-light" style="top: calc(var(--sticky-padding-top) + 48px); height: 1px;"></div></div></div><div class="pointer-events-none absolute inset-x-px top-0 bottom-96"><div class="pointer-events-none sticky z-40 shrink-0 z-1!" style="top: calc(var(--sticky-padding-top) - 48px * 3); margin-bottom: calc(-192px); height: calc(192px); mask-image: linear-gradient(transparent 25%, white 75%);"><div class="sticky bg-token-bg-elevated-secondary" style="top: var(--sticky-padding-top); height: 48px;"></div></div></div><div class="corner-superellipse/1.1 rounded-3xl bg-token-bg-elevated-secondary" style="transform: none;"><div class="relative z-0 flex max-w-full"><div id="code-block-viewer" dir="ltr" class="q9tKkq_viewer cm-editor z-10 light:cm-light dark:cm-light flex h-full w-full flex-col items-stretch ͼk ͼy"><div class="cm-scroller"><div class="cm-content q9tKkq_readonly"><span>du </span><span class="ͼu">-sh</span><span> /usr/local/texlive/2025/texmf-dist/tex/latex/*</span></div></div></div></div></div></div></div></div><div class=""><div class="" style="width: 100%; transform: none;"></div></div></div></div></div></pre>
+<hr data-start="891" data-end="894">
+<h2 data-start="896" data-end="911">判断指針（迷ったらこれ）</h2>
+<ul data-start="913" data-end="1038">
+<li data-start="913" data-end="951">
+<p data-start="915" data-end="951"><strong data-start="915" data-end="933">研究室PC / ローカル用途</strong> → 入れてOK（ディスク余裕ある）</p>
+</li>
+<li data-start="952" data-end="996">
+<p data-start="954" data-end="996"><strong data-start="954" data-end="984">Docker / WSL / Overleaf CE</strong> → ❌入れない方がいい</p>
+</li>
+<li data-start="997" data-end="1038">
+<p data-start="999" data-end="1038"><strong data-start="999" data-end="1018">エラーで sty が足りない時</strong> → 個別に tlmgr install</p>
+</li>
+</ul>
+<hr data-start="1040" data-end="1043">
+<h2 data-start="1045" data-end="1051">まとめ</h2>
+<ul data-start="1053" data-end="1131">
+<li data-start="1053" data-end="1090">
+<p data-start="1055" data-end="1090"><code data-start="1055" data-end="1078">collection-latexextra</code> は <strong data-start="1081" data-end="1090">1GB超級</strong></p>
+</li>
+<li data-start="1091" data-end="1107">
+<p data-start="1093" data-end="1107">今回の目的には <strong data-start="1101" data-end="1107">不要</strong></p>
+</li>
+<li data-start="1108" data-end="1131">
+<p data-start="1110" data-end="1131">fancybox 単体インストールが最適解</p>
+</li>
+</ul>
+<p data-start="1133" data-end="1177" data-is-last-node="" data-is-only-node="">この判断ができてる時点で、<br data-start="1146" data-end="1149">
+もう Overleaf ローカル運用の理解はかなり深い。</p></div>

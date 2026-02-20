@@ -11,9 +11,60 @@
  */
 export function preprocessNode(node: HTMLElement): HTMLElement {
     const clone = node.cloneNode(true) as HTMLElement;
+    simplifyCodeBlocks(clone);
     replaceKatexNodes(clone);
     removeUiChrome(clone);
     return clone;
+}
+
+/**
+ * ChatGPT の複雑なコードブロック構造を単純な <pre><code> に変換する。
+ */
+function simplifyCodeBlocks(root: HTMLElement): void {
+    const preElements = Array.from(root.querySelectorAll('pre'));
+    const doc = root.ownerDocument ?? document;
+
+    for (const pre of preElements) {
+        // 言語名を探す (例: "Python", "Bash")
+        // ChatGPT では通常、ボタンの近くの div に言語名がある
+        const langDiv = pre.querySelector('div.flex.items-center.text-token-text-primary');
+        const language = langDiv?.textContent?.trim() ?? '';
+
+        // コード本文を探す (CodeMirror の構造)
+        // CodeMirror は行ごとに div.cm-line や br で構成されている
+        const codeContent = pre.querySelector('.cm-content');
+        if (!codeContent) continue;
+
+        const codeClone = codeContent.cloneNode(true) as HTMLElement;
+
+        // cm-line クラスを持つ div があれば、その後に改行を補完
+        const lines = codeClone.querySelectorAll('.cm-line');
+        if (lines.length > 0) {
+            for (const line of Array.from(lines)) {
+                // すでに改行で終わっていない場合のみ追加
+                if (!line.textContent?.endsWith('\n')) {
+                    line.appendChild(doc.createTextNode('\n'));
+                }
+            }
+        } else {
+            // br を \n に置換
+            const brs = codeClone.querySelectorAll('br');
+            for (const br of Array.from(brs)) {
+                br.replaceWith('\n');
+            }
+        }
+
+        const newPre = doc.createElement('pre');
+        const newCode = doc.createElement('code');
+        if (language) {
+            newCode.className = `language-${language}`;
+        }
+
+        newCode.textContent = codeClone.textContent;
+        newPre.appendChild(newCode);
+
+        pre.replaceWith(newPre);
+    }
 }
 
 /**
