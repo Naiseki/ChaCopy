@@ -28,7 +28,8 @@ export function postprocess(markdown: string): string {
  */
 export function normalizeBold(markdown: string): string {
     const segments = splitProtectedSegments(markdown);
-    const noSpaceChars = /[\s\n]/;
+    // 空白・改行・Markdown 特殊文字（*_~）に隣接する場合はスペース挿入不要
+    const noAddSpace = /[\s\n*_~]/;
 
     let result = '';
     let inBold = false;
@@ -49,17 +50,32 @@ export function normalizeBold(markdown: string): string {
             }
 
             if (!inBold) {
-                // 開き **: 直前が非スペースなら空白を挿入
-                if (result.length > 0 && !noSpaceChars.test(result.slice(-1))) {
+                // 開き **: 以下の場合のみ前にスペースを挿入
+                //   - result が空でない
+                //   - 直前が非スペース非特殊文字
+                //   - bold の内容が空でない（**** のような空 bold を跨ぐ場合を除外）
+                const boldContent = parts[i];
+                if (
+                    result.length > 0 &&
+                    boldContent.length > 0 &&
+                    !noAddSpace.test(result.slice(-1))
+                ) {
                     result += ' ';
                 }
                 result += '**';
                 inBold = true;
             } else {
-                // 閉じ **: 直後が非スペースなら空白を挿入
+                // 閉じ **: 以下の場合のみ後にスペースを挿入
+                //   - bold の内容が空でない（**** のような空 bold を跨ぐ場合を除外）
+                //   - 直後が非スペース非特殊文字
                 result += '**';
+                const boldContent = parts[i - 1];
                 const nextPart = parts[i];
-                if (nextPart.length > 0 && !noSpaceChars.test(nextPart[0])) {
+                if (
+                    boldContent.length > 0 &&
+                    nextPart.length > 0 &&
+                    !noAddSpace.test(nextPart[0])
+                ) {
                     result += ' ';
                 }
                 inBold = false;

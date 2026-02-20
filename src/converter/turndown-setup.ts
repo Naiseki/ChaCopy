@@ -53,6 +53,30 @@ export function getTurndownService(): TurndownService {
         },
     });
 
+    // <del> の二重チルダ: GFM プラグインが単一 ~ を使う場合に上書きする
+    service.addRule('strikethrough-double', {
+        filter: ['del', 's'],
+        replacement(content) {
+            return `~~${content}~~`;
+        },
+    });
+
+    // チェックボックス: <input type="checkbox"> を [x] / [ ] に変換
+    service.addRule('checkbox', {
+        filter(node) {
+            return (
+                node.nodeName === 'INPUT' &&
+                (node as HTMLInputElement).type === 'checkbox'
+            );
+        },
+        replacement(_content, node) {
+            return (node as HTMLInputElement).checked ? '[x] ' : '[ ] ';
+        },
+    });
+
+    // エスケープを無効化（バックスラッシュを挿入しない）
+    service.escape = (str: string) => str;
+
     _service = service;
     return service;
 }
