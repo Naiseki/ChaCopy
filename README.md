@@ -1,4 +1,4 @@
-# ChappyMD
+# ChaCopy
 
 ChatGPT の各メッセージにワンボタンを追加し、発言を**整形された Markdown 形式**でクリップボードにコピーする Chrome 拡張機能。
 
@@ -87,7 +87,7 @@ ChatGPT DOM
 ### ディレクトリ構成
 
 ```
-ChappyMD/
+ChaCopy/
 ├── manifest.json
 ├── src/
 │   ├── content.ts                  # エントリポイント

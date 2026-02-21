@@ -115,7 +115,7 @@ function replaceKatexNodes(root: HTMLElement): void {
  *
  * 作成される span には以下の特性がある:
  * - オーナードキュメント: contextNode のオーナードキュメントに従う（フォールバック: グローバル document）
- * - 属性: `data-chappymd-math="true"` を設定
+ * - 属性: `data-chacopy-math="true"` を設定
  * - コンテンツ: 提供された content を textContent として格納
  *
  * @param content - span に格納する数式コンテンツ（例: 生の LaTeX）
@@ -125,7 +125,7 @@ function replaceKatexNodes(root: HTMLElement): void {
 function createMathNode(content: string, contextNode: HTMLElement): HTMLSpanElement {
     const doc = contextNode.ownerDocument ?? document;
     const span = doc.createElement('span');
-    span.setAttribute('data-chappymd-math', 'true');
+    span.setAttribute('data-chacopy-math', 'true');
     span.textContent = content;
     return span;
 }

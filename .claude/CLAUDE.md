@@ -1,8 +1,8 @@
-# ChappyMD 仕様書
+# ChaCopy 仕様書
 
 ## 概要
 
-ChappyMD は ChatGPT の各メッセージにワンボタンを追加し、
+ChaCopy は ChatGPT の各メッセージにワンボタンを追加し、
 その発言を **壊れない Markdown 形式へ変換してクリップボードにコピーする Chrome 拡張機能** である。
 
 主目的：

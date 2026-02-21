@@ -8,7 +8,7 @@ let _service: TurndownService | null = null;
  *
  * 初回呼び出し時に以下を設定:
  * 1. GFM プラグイン: テーブルと取消線対応
- * 2. カスタムルール「chappymd-math」: 数式プレースホルダを保護（エスケープしない）
+ * 2. カスタムルール「chacopy-math」: 数式プレースホルダを保護（エスケープしない）
  * 3. カスタムルール「linebreak」: <br> を改行に変換
  *
  * 以降の呼び出しキャッシュされたインスタンスを返す（シングルトン）。
@@ -33,11 +33,11 @@ export function getTurndownService(): TurndownService {
 
     // 数式パススルールール: textContent をエスケープせずそのまま返す。
     // gfm より後に追加することで優先度が高くなる。
-    service.addRule('chappymd-math', {
+    service.addRule('chacopy-math', {
         filter(node) {
             return (
                 node.nodeName === 'SPAN' &&
-                (node as Element).hasAttribute('data-chappymd-math')
+                (node as Element).hasAttribute('data-chacopy-math')
             );
         },
         replacement(_content, node) {

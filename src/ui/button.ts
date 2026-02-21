@@ -1,6 +1,6 @@
 import { domToMarkdown } from '../converter/index';
 
-const INJECTED_ATTR = 'data-chappymd-injected';
+const INJECTED_ATTR = 'data-chacopy-injected';
 const COPY_BTN_SELECTOR = '[data-testid="copy-turn-action-button"]';
 const CONTENT_SELECTOR = '.markdown.prose';
 
@@ -58,7 +58,7 @@ export function injectButtonIntoArticle(article: HTMLElement): void {
 function createMdButton(article: HTMLElement): HTMLButtonElement {
     const btn = document.createElement('button');
     btn.setAttribute('aria-label', 'Copy as Markdown');
-    btn.setAttribute('title', 'Copy as Markdown (ChappyMD)');
+    btn.setAttribute('title', 'Copy as Markdown (ChaCopy)');
 
     // 洗練されたモダンデザイン
     btn.style.cssText = `
@@ -136,12 +136,12 @@ function createMdButton(article: HTMLElement): HTMLButtonElement {
 async function handleClick(article: HTMLElement, btn: HTMLButtonElement, initialHTML: string): Promise<void> {
     const contentEl = article.querySelector<HTMLElement>(CONTENT_SELECTOR);
     if (!contentEl) {
-        console.warn('[ChappyMD] メッセージ要素が見つかりません');
+        console.warn('[ChaCopy] メッセージ要素が見つかりません');
         return;
     }
 
     // DEBUG: 変換前のテキストをログに出力
-    console.log("[ChappyMD] コンテンツを Markdown に変換中...");
+    console.log("[ChaCopy] コンテンツを Markdown に変換中...");
     console.log(contentEl); // 変換前のテキストをログに出力
 
     const markdown = domToMarkdown(contentEl);
@@ -152,7 +152,7 @@ async function handleClick(article: HTMLElement, btn: HTMLButtonElement, initial
         btn.textContent = 'Copied!';
         setTimeout(() => { btn.innerHTML = initialHTML; }, 1500);
     } catch (err) {
-        console.error('[ChappyMD] クリップボード書き込み失敗:', err);
+        console.error('[ChaCopy] クリップボード書き込み失敗:', err);
         btn.innerHTML = '';
         btn.style.color = '#ff4500'; // エラーメッセージは赤色に
         btn.textContent = 'ERR';

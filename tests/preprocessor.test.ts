@@ -42,7 +42,7 @@ describe('preprocessor', () => {
         );
         const result = preprocessNode(el);
         // 数式 span は1つだけ（ブロック形式）
-        const mathSpans = result.querySelectorAll('[data-chappymd-math]');
+        const mathSpans = result.querySelectorAll('[data-chacopy-math]');
         expect(mathSpans).toHaveLength(1);
         expect(mathSpans[0].textContent).toContain('$$E=mc^2$$');
     });
