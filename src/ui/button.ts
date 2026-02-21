@@ -82,7 +82,7 @@ function createMdButton(article: HTMLElement): HTMLButtonElement {
 
     // コピーアイコン画像を設定
     const img = document.createElement('img');
-    img.src = chrome.runtime.getURL('img/copy_btn.png');
+    img.src = chrome.runtime.getURL('img/chacopy_icon48.png');
     img.alt = 'Copy';
     img.style.cssText = 'width: 19px; height: 19px; object-fit: contain;';
     btn.appendChild(img);

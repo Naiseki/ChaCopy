@@ -3,7 +3,7 @@
   "name": "ChaCopy",
   "version": "0.1.0",
   "description": "Copy ChatGPT messages as clean Markdown",
-  "permissions": ["clipboardWrite"],
+  "permissions": [],
   "host_permissions": [
     "https://chatgpt.com/*",
     "https://chat.openai.com/*"
@@ -20,10 +20,14 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["img/copy_btn.png"],
+      "resources": ["img/chacopy_icon48.png"],
       "matches": ["https://chatgpt.com/*", "https://chat.openai.com/*"]
     }
   ],
+    "icons": {
+    "48": "img/chacopy_icon48.png",
+    "128": "img/chacopy_icon128.png"
+  },
   "action": {
     "default_title": "ChaCopy"
   }
