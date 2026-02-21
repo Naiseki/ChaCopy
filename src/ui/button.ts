@@ -154,6 +154,7 @@ async function handleClick(article: HTMLElement, btn: HTMLButtonElement, initial
     } catch (err) {
         console.error('[ChappyMD] クリップボード書き込み失敗:', err);
         btn.innerHTML = '';
+        btn.style.color = '#ff4500'; // エラーメッセージは赤色に
         btn.textContent = 'ERR';
         setTimeout(() => { btn.innerHTML = initialHTML; }, 1500);
     }
