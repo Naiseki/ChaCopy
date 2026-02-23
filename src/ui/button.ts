@@ -140,10 +140,6 @@ async function handleClick(article: HTMLElement, btn: HTMLButtonElement, initial
         return;
     }
 
-    // DEBUG: 変換前のテキストをログに出力
-    console.log("[ChaCopy] コンテンツを Markdown に変換中...");
-    console.log(contentEl); // 変換前のテキストをログに出力
-
     const markdown = domToMarkdown(contentEl);
 
     try {
