@@ -93,12 +93,14 @@ ChatGPT DOM
 ChaCopy/
 ├── manifest.json
 ├── package.json
+├── _locales/
+├── chacopy/
 ├── img/
 ├── src/
 │   ├── converter/
 │   └── ui/
-├── test_res/
 └── tests/
+    └── res/
 ```
 
 ### 技術スタック

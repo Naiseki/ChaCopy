@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { domToMarkdown } from '../src/converter/index';
 
-const TEST_RES_DIR = path.resolve(import.meta.dirname, '../test_res');
+const TEST_RES_DIR = path.resolve(import.meta.dirname, 'res/');
 
 /**
  * HTML文字列を HTMLElement に変換する。
