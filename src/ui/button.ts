@@ -155,7 +155,7 @@ async function handleClick(article: HTMLElement, btn: HTMLButtonElement, initial
         console.error('[ChaCopy] クリップボード書き込み失敗:', err);
         btn.innerHTML = '';
         btn.style.color = '#ff4500'; // エラーメッセージは赤色に
-        btn.textContent = 'ERR';
+        btn.textContent = 'ERROR';
         setTimeout(() => { btn.innerHTML = initialHTML; }, 1500);
     }
 }

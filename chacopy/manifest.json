@@ -11,21 +11,28 @@
   ],
   "content_scripts": [
     {
+      "js": [
+        "assets/content.ts-C5zqIFaP.js"
+      ],
       "matches": [
         "https://chatgpt.com/*",
         "https://chat.openai.com/*"
       ],
-      "js": ["src/content.ts"],
       "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["img/chacopy_icon48.png"],
-      "matches": ["https://chatgpt.com/*", "https://chat.openai.com/*"]
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://chatgpt.com/*"
+      ],
+      "resources": [
+        "img/chacopy_icon48.png"
+      ]
     }
   ],
-    "icons": {
+  "icons": {
     "48": "img/chacopy_icon48.png",
     "128": "img/chacopy_icon128.png"
   },
@@ -33,4 +40,3 @@
     "default_title": "ChaCopy BETA"
   }
 }
-
