@@ -69,7 +69,6 @@ function createMdButton(article: HTMLElement): HTMLButtonElement {
         border: 1px solid transparent;
         border-radius: 8px;
         background-color: transparent;
-        color: #00ff7f;
         transition: all 150ms cubic-bezier(0.2, 0, 0.38, 0.9);
         display: inline-flex;
         align-items: center;
@@ -126,7 +125,7 @@ function createMdButton(article: HTMLElement): HTMLButtonElement {
  * 2. domToMarkdown() で Markdown に変換
  * 3. navigator.clipboard.writeText() でクリップボードにコピー
  * 4. 成功時: ボタンに "Copied!" を表示
- * 5. 失敗時: ボタンに "ERR" を表示
+ * 5. 失敗時: ボタンに "ERROR" を表示
  * 6. 1.5 秒後: 初期状態（アイコン）に戻す
  *
  * @param article - コンテンツを含む article 要素
@@ -136,7 +135,7 @@ function createMdButton(article: HTMLElement): HTMLButtonElement {
 async function handleClick(article: HTMLElement, btn: HTMLButtonElement, initialHTML: string): Promise<void> {
     const contentEl = article.querySelector<HTMLElement>(CONTENT_SELECTOR);
     if (!contentEl) {
-        console.warn('[ChaCopy] メッセージ要素が見つかりません');
+        console.warn('[ChaCopy]  Message element not found');
         return;
     }
 
@@ -145,10 +144,12 @@ async function handleClick(article: HTMLElement, btn: HTMLButtonElement, initial
     try {
         await navigator.clipboard.writeText(markdown);
         btn.innerHTML = '';
+        btn.style.color = '#00ff7f';
         btn.textContent = 'Copied!';
         setTimeout(() => { btn.innerHTML = initialHTML; }, 1500);
-    } catch (err) {
-        console.error('[ChaCopy] クリップボード書き込み失敗:', err);
+    } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        console.error('[ChaCopy] Failed to write to clipboard:', message);
         btn.innerHTML = '';
         btn.style.color = '#ff4500'; // エラーメッセージは赤色に
         btn.textContent = 'ERROR';
