@@ -19,6 +19,8 @@ export function preprocessNode(node: HTMLElement): HTMLElement {
 
 /**
  * ChatGPT の複雑なコードブロック構造を単純な <pre><code> に変換する。
+ * 
+ * @param root - 処理対象のルート HTMLElement
  */
 function simplifyCodeBlocks(root: HTMLElement): void {
     const preElements = Array.from(root.querySelectorAll('pre'));
