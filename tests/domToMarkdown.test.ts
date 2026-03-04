@@ -34,7 +34,7 @@ describe('domToMarkdown ファイルベーステスト', () => {
         }
 
         const inputHtml = fs.readFileSync(htmlPath, 'utf-8');
-        const expectedMd = fs.readFileSync(mdPath, 'utf-8').trim();
+        const expectedMd = fs.readFileSync(mdPath, 'utf-8').replace(/\r\n/g, '\n').trim();
 
         const el = makeHTMLElement(inputHtml);
         const actualMd = domToMarkdown(el).trim();
