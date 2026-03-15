@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "ChaCopy BETA",
-  "version": "0.1.1",
+  "name": "ChaCopy",
+  "version": "1.0.0",
   "description": "__MSG_appDescription__",
   "default_locale": "en",
   "permissions": [],
@@ -30,7 +30,6 @@
     "128": "img/chacopy_icon128.png"
   },
   "action": {
-    "default_title": "ChaCopy BETA"
+    "default_title": "ChaCopy"
   }
 }
-
