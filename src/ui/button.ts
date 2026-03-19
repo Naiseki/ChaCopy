@@ -3,44 +3,40 @@ import { domToMarkdown } from '../converter/index';
 const INJECTED_ATTR = 'data-chacopy-injected';
 const COPY_BTN_SELECTOR = '[data-testid="copy-turn-action-button"]';
 const CONTENT_SELECTOR = '.markdown.prose';
+const ASSISTANT_SELECTOR = '[data-message-author-role="assistant"]';
+const RESPONSE_ACTIONS_SELECTOR = '[aria-label="Response actions"]';
 
 /**
  * ページ内の既存アシスタントメッセージに MD ボタンを注入する。
  *
- * 以下の条件を満たす article に対してボタンを注入:
- * - アシスタントメッセージである（data-message-author-role="assistant"）
- * - コピーボタンが既に存在している（ストリーミング完了を示す）
+ * 既存の ChatGPT コピーボタンを起点に、対応するアシスタントメッセージへ
+ * MD ボタンを注入する。
  */
 export function injectButtonsIntoPage(): void {
-    const articles = document.querySelectorAll<HTMLElement>(
-        'article[data-testid^="conversation-turn-"]'
-    );
-    for (const article of articles) {
-        if (
-            article.querySelector('[data-message-author-role="assistant"]') &&
-            article.querySelector(COPY_BTN_SELECTOR)
-        ) {
-            injectButtonIntoArticle(article);
-        }
+    const copyButtons = document.querySelectorAll<HTMLElement>(COPY_BTN_SELECTOR);
+    for (const copyButton of copyButtons) {
+        injectButtonIntoCopyButton(copyButton);
     }
 }
 
 /**
- * 指定の article に MD ボタンを注入する（冪等操作）。
+ * 指定のコピーボタンの横に MD ボタンを注入する（冪等操作）。
  *
  * すでに注入済みの場合は何もしない。コピーボタンが見つからない場合も処理をスキップ。
  *
- * @param article - ボタンを注入する article 要素
+ * @param copyButton - ChatGPT 既存のコピーボタン
  */
-export function injectButtonIntoArticle(article: HTMLElement): void {
-    if (article.hasAttribute(INJECTED_ATTR)) return;
+export function injectButtonIntoCopyButton(copyButton: HTMLElement): boolean {
+    if (copyButton.parentElement?.querySelector('[data-chacopy-button="true"]')) {
+        return false;
+    }
+    if (!findMessageRoot(copyButton)) {
+        return false;
+    }
 
-    const copyButton = article.querySelector<HTMLElement>(COPY_BTN_SELECTOR);
-    if (!copyButton) return;
-
-    const mdButton = createMdButton(article);
+    const mdButton = createMdButton(copyButton);
     copyButton.insertAdjacentElement('afterend', mdButton);
-    article.setAttribute(INJECTED_ATTR, 'true');
+    return true;
 }
 
 /**
@@ -52,13 +48,14 @@ export function injectButtonIntoArticle(article: HTMLElement): void {
  * - クリック時: スケール（0.95倍に縮小）
  * - クリック後: "Copied!" またはエラーメッセージを1.5秒表示
  *
- * @param article - ボタンを関連付ける article 要素（クリック時に参照）
+ * @param copyButton - 元になった ChatGPT のコピーボタン
  * @returns 作成された button 要素
  */
-function createMdButton(article: HTMLElement): HTMLButtonElement {
+function createMdButton(copyButton: HTMLElement): HTMLButtonElement {
     const btn = document.createElement('button');
     btn.setAttribute('aria-label', 'Copy as Markdown');
     btn.setAttribute('title', 'Copy as Markdown (ChaCopy)');
+    btn.setAttribute('data-chacopy-button', 'true');
 
     // 洗練されたモダンデザイン
     btn.style.cssText = `
@@ -112,7 +109,7 @@ function createMdButton(article: HTMLElement): HTMLButtonElement {
         btn.style.transform = 'scale(1)';
     });
 
-    btn.addEventListener('click', () => void handleClick(article, btn, initialHTML));
+    btn.addEventListener('click', () => void handleClick(copyButton, btn, initialHTML));
 
     return btn;
 }
@@ -128,12 +125,22 @@ function createMdButton(article: HTMLElement): HTMLButtonElement {
  * 5. 失敗時: ボタンに "ERROR" を表示
  * 6. 1.5 秒後: 初期状態（アイコン）に戻す
  *
- * @param article - コンテンツを含む article 要素
+ * @param copyButton - 押下元と同じターンにある ChatGPT のコピーボタン
  * @param btn - フィードバック表示用のボタン要素
  * @param initialHTML - ボタンの初期状態（アイコン）の HTML
  */
-async function handleClick(article: HTMLElement, btn: HTMLButtonElement, initialHTML: string): Promise<void> {
-    const contentEl = article.querySelector<HTMLElement>(CONTENT_SELECTOR);
+async function handleClick(copyButton: HTMLElement, btn: HTMLButtonElement, initialHTML: string): Promise<void> {
+    const messageRoot = findMessageRoot(copyButton);
+    if (!messageRoot) {
+        console.warn('[ChaCopy] Message root not found');
+        return;
+    }
+
+    if (!messageRoot.hasAttribute(INJECTED_ATTR)) {
+        messageRoot.setAttribute(INJECTED_ATTR, 'true');
+    }
+
+    const contentEl = messageRoot.querySelector<HTMLElement>(CONTENT_SELECTOR);
     if (!contentEl) {
         console.warn('[ChaCopy]  Message element not found');
         return;
@@ -155,4 +162,25 @@ async function handleClick(article: HTMLElement, btn: HTMLButtonElement, initial
         btn.textContent = 'ERROR';
         setTimeout(() => { btn.innerHTML = initialHTML; }, 1500);
     }
+}
+
+function findMessageRoot(copyButton: HTMLElement): HTMLElement | null {
+    const responseActions = copyButton.closest<HTMLElement>(RESPONSE_ACTIONS_SELECTOR);
+    if (!responseActions) {
+        return null;
+    }
+
+    let current = responseActions.parentElement;
+    while (current) {
+        if (
+            current.querySelector(ASSISTANT_SELECTOR) &&
+            current.querySelector(CONTENT_SELECTOR) &&
+            current.querySelector(RESPONSE_ACTIONS_SELECTOR)
+        ) {
+            return current;
+        }
+        current = current.parentElement;
+    }
+
+    return null;
 }
