@@ -4,13 +4,13 @@ const INJECTED_ATTR = 'data-chacopy-injected';
 const COPY_BTN_SELECTOR = '[data-testid="copy-turn-action-button"]';
 const CONTENT_SELECTOR = '.markdown.prose';
 const ASSISTANT_SELECTOR = '[data-message-author-role="assistant"]';
-const RESPONSE_ACTIONS_SELECTOR = '[aria-label="Response actions"]';
+const RESPONSE_ACTIONS_SELECTOR = '[aria-label="Response actions"], [aria-label="回答のアクション"]';
 
 /**
- * ページ内の既存アシスタントメッセージに MD ボタンを注入する。
+ * ページ内の既存アシスタントメッセージに ChaCopy ボタンを注入する。
  *
  * 既存の ChatGPT コピーボタンを起点に、対応するアシスタントメッセージへ
- * MD ボタンを注入する。
+ * ChaCopy ボタンを注入する。
  */
 export function injectButtonsIntoPage(): void {
     const copyButtons = document.querySelectorAll<HTMLElement>(COPY_BTN_SELECTOR);
@@ -20,7 +20,7 @@ export function injectButtonsIntoPage(): void {
 }
 
 /**
- * 指定のコピーボタンの横に MD ボタンを注入する（冪等操作）。
+ * 指定のコピーボタンの横に ChaCopy ボタンを注入する（冪等操作）。
  *
  * すでに注入済みの場合は何もしない。コピーボタンが見つからない場合も処理をスキップ。
  *
@@ -40,7 +40,7 @@ export function injectButtonIntoCopyButton(copyButton: HTMLElement): boolean {
 }
 
 /**
- * MD ボタン要素を作成する。
+ * ChaCopy ボタン要素を作成する。
  *
  * 作成されるボタンの特徴:
  * - 初期状態: コピーアイコン画像（img/copy_btn.png）を表示
@@ -115,7 +115,7 @@ function createMdButton(copyButton: HTMLElement): HTMLButtonElement {
 }
 
 /**
- * MD ボタンのクリックハンドラー。
+ * ChaCopy ボタンのクリックハンドラー。
  *
  * 処理フロー:
  * 1. article からコンテンツ（.markdown.prose）を取得
