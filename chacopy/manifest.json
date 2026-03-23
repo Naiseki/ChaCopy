@@ -28,10 +28,8 @@
         "https://chatgpt.com/*"
       ],
       "resources": [
-        "img/chacopy_icon48.png",
-        "assets/content.ts-Dh4HyWbM.js"
-      ],
-      "use_dynamic_url": false
+        "img/chacopy_icon48.png"
+      ]
     }
   ],
   "icons": {
