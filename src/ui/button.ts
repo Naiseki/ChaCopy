@@ -4,7 +4,7 @@ const INJECTED_ATTR = 'data-chacopy-injected';
 const COPY_BTN_SELECTOR = '[data-testid="copy-turn-action-button"]';
 const CONTENT_SELECTOR = '.markdown.prose';
 const ASSISTANT_SELECTOR = '[data-message-author-role="assistant"]';
-const RESPONSE_ACTIONS_SELECTOR = '[aria-label="Response actions"], [aria-label="回答のアクション"]';
+const RESPONSE_ACTIONS_SELECTOR = '[class="touch:-me-2 touch:-ms-3.5 -ms-2.5 -me-1 flex flex-wrap items-center gap-y-4 p-1 select-none touch:w-[calc(100%+--spacing(3.5))] -mt-1 w-[calc(100%+--spacing(2.5))] duration-[1.5s] focus-within:transition-none hover:transition-none touch:pointer-events-auto pointer-events-none [mask-image:linear-gradient(to_right,black_33%,transparent_66%)] [mask-size:300%_100%] [mask-position:100%_0%] motion-safe:transition-[mask-position] group-hover/turn-messages:pointer-events-auto group-hover/turn-messages:[mask-position:0_0] group-focus-within/turn-messages:pointer-events-auto group-focus-within/turn-messages:[mask-position:0_0] has-data-[state=open]:pointer-events-auto has-data-[state=open]:[mask-position:0_0]"], [aria-label="Response actions"], [aria-label="回答のアクション"], [aria-label="応答アクション"]';
 
 /**
  * ページ内の既存アシスタントメッセージに ChaCopy ボタンを注入する。
